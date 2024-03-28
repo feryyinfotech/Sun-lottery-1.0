@@ -1,29 +1,14 @@
-import { Container, Typography, Box, Stack, } from '@mui/material'
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { CheckCircle } from '@mui/icons-material';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import empty from '../../../assets/images/empty.png'
-import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
-import Layout from '../../../component/Layout/Layout';
-import { NavLink } from 'react-router-dom';
-import Customer from '../../../assets/images/customerBg.png'
-import { zubgback, zubgbackgrad, zubgmid } from '../../../Shared/color';
-import customer from '../../../assets/images/supportgirls.png';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
+import { Box, Container, Stack, Typography, } from '@mui/material';
+import * as React from 'react';
+import { NavLink } from 'react-router-dom';
+import { zubgback, zubgmid } from '../../../Shared/color';
+import customer from '../../../assets/images/supportgirls.png';
+import Layout from '../../../component/Layout/Layout';
 
 
 function Subordinate() {
-
-
-  const [value, setValue] = React.useState(0);
-  console.log(value)
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
-
   return (
     <Layout>
       <Container sx={{ background: zubgback, width: '100%', height: '100vh', overflow: 'auto' }}>
