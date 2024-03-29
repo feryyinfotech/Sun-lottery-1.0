@@ -37,6 +37,7 @@ export const endpoint ={
   daily_wallet_income:`${baseUrl}/api/daily-wallet-income`,
   add_bank_details:`${baseUrl}/api/bank-add`,
   get_bank_list:`${baseUrl}/api/user-bank-details`,
+  promotion_data:`https://aviator-backend-p1xp.onrender.com/api/v1/promotiondata`,
 
   // aviator api's
   aviator_login:`${baseUrl}/api/aviator/login`,

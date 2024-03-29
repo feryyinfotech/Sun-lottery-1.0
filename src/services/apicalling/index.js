@@ -12,6 +12,15 @@ export const MyProfileDataFn = async () => {
     console.log(e);
   }
 };
+export const MypromotionDataFn = async () => {
+  try {
+    const response = await axios.get(`${endpoint.promotion_data}?id=${Number(user_id)}`);
+    return response;
+  } catch (e) {
+    toast(e?.message);
+    console.log(e);
+  }
+};
 export const get_user_data_fn = async () => {
   try {
     const response = await axios.get(
