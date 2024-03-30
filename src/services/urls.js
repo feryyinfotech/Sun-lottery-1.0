@@ -4,7 +4,7 @@ export const rupees = "₹"
 //  export const baseUrl = "https://bike.vpayout.com"
  export const baseUrl = "https://admin.sunlottery.fun"
 //  export const baseUrl = "https://admin.gameszone.life"
-
+export const fron_end_main_domain = "https://sunlottery.fun"
 
 // export const domain = "http://192.168.18.183:9000"
 // export const domain = "https://app.ferryinfotech.in/"

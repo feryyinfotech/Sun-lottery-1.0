@@ -15,7 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import copy from "clipboard-copy";
-import CryptoJS from "crypto-js";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -27,6 +26,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { checkTokenValidity } from "../../Shared/CookieStorage";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
 import { gray, zubgback, zubgbackgrad, zubgmid } from "../../Shared/color";
 import aviator_game_image from "../../assets/aviator_game_image.png";
@@ -61,12 +61,11 @@ import {
   get_user_data_fn,
   walletamount,
 } from "../../services/apicalling";
+import { fron_end_main_domain, support_mail, telegram_url } from "../../services/urls";
 import Lottery from "./DashboadSubcomponent/Lottery";
 import Original from "./DashboadSubcomponent/Original";
 import Sports from "./DashboadSubcomponent/Sports";
 import Notification from "./Notification";
-import { checkTokenValidity } from "../../Shared/CookieStorage";
-import { support_mail, telegram_url } from "../../services/urls";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -126,7 +125,7 @@ function Dashboard() {
 
   const initialValues = {
     //  referrel_code: `https://play.ferryinfotech.in/register?ref=${referal_code}`,
-    referrel_code: `https://sunlottery.fun/register?ref=${result?.referral_code}`,
+    referrel_code: `${fron_end_main_domain}/register?ref=${result?.referral_code}`,
     // referrel_code: `https://play.ferryinfotech.in/register?ref=${referal_code}`,
   };
 

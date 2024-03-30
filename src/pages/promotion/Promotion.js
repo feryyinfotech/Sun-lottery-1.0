@@ -16,6 +16,8 @@ import money from "../../assets/images/salary.png";
 import coin from "../../assets/images/settings.png";
 import Layout from "../../component/Layout/Layout";
 import { MypromotionDataFn } from "../../services/apicalling";
+import CustomCircularProgress from "../../Shared/CustomCircularProgress";
+import { fron_end_main_domain } from "../../services/urls";
 
 function Promotion() {
   const { isLoading, data } = useQuery(
@@ -37,6 +39,7 @@ function Promotion() {
   return (
     <Layout>
       <Container>
+      <CustomCircularProgress isLoading={isLoading}/>
         <Box sx={style.header}>
           <Typography variant="body1" color="initial">
             {" "}
@@ -188,7 +191,10 @@ function Promotion() {
               </Box>
             </Box>
             <Box sx={style.invitebtn}>
-              <NavLink to="/promotion/PromotionShare">
+              <NavLink
+              //  to="/promotion/PromotionShare"
+              onClick={() => functionTOCopy(`${fron_end_main_domain}/register?ref=${result?.referral_code}`)}
+               >
                 <Typography sx={{}}>INVITATION LINK</Typography>
               </NavLink>
             </Box>
@@ -289,40 +295,40 @@ function Promotion() {
                   {/* <Box component='img' src={download}></Box> */}
                   <Box component="img" src={data}></Box>
                   <Typography variant="body1" color="initial">
-                    promotion data
+                    Promotion data
                   </Typography>
                 </Stack>
               </Box>
               <Stack direction="row">
                 <Box>
                   <Typography variant="body1" color="initial">
-                    0
+                  {Number(Number(result?.turnover || 0)+Number(result?.today_turnover || 0))?.toFixed(2)}
                   </Typography>
                   <Typography variant="body1" color="initial">
-                    This Week
+                   Total Turnover
                   </Typography>
                 </Box>
                 <Box>
                   <Typography variant="body1" color="initial">
-                    0
+                  {result?.commission || 0}
                   </Typography>
                   <Typography variant="body1" color="initial">
-                    Total commission
+                    Total Commission
                   </Typography>
                 </Box>
               </Stack>
               <Stack direction="row">
                 <Box>
                   <Typography variant="body1" color="initial">
-                    0
+                  {result?.count || 0}
                   </Typography>
                   <Typography variant="body1" color="initial">
-                    direct subordinate
+                    Direct subordinate
                   </Typography>
                 </Box>
                 <Box>
                   <Typography variant="body1" color="initial">
-                    0
+                  {result?.teamcount || 0}
                   </Typography>
                   <Typography variant="body1" color="initial">
                     Total number of <br />
