@@ -104,12 +104,11 @@ const TwoMinCountDown = ({ fk }) => {
         threemin?.split("_")?.[1] === "0" &&
         threemin?.split("_")?.[0] === "0"
       ) {
-        client.refetchQueries("gamehistory");
-        client.refetchQueries("walletamount");
-        client.refetchQueries("gamehistory_chart");
-        client.refetchQueries("myhistory");
-        client.refetchQueries("myAllhistory");
-        dispatch(dummycounterFun());
+        // client.refetchQueries("gamehistory");
+        // client.refetchQueries("gamehistory_chart");
+        // client.refetchQueries("myhistory");
+        // client.refetchQueries("myAllhistory");
+        // dispatch(dummycounterFun());
       }
     };
 
@@ -119,6 +118,7 @@ const TwoMinCountDown = ({ fk }) => {
       socket.off("threemin", handleThreeMin);
     };
   }, []);
+
 
   const audioRefMusic = React.useRef(null);
   const handlePlaySound = async () => {

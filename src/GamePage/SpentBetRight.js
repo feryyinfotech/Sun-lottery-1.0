@@ -17,6 +17,9 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
+  const first_rechange =
+  aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge
+  
   const amount_total =
     client.getQueriesData("walletamount_aviator")?.[0]?.[1]?.data?.data || 0;
   const pre_amount = Number(
@@ -48,6 +51,9 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   });
 
   const spentBit = async () => {
+    if(Number(first_rechange) !== 1){
+      return toast("You must be sure that , your first deposit is done.");
+    }
     setloding(true);
     const reqbody = {
       userid: aviator_login_data && JSON.parse(aviator_login_data)?.id || 2,

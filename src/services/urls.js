@@ -1,20 +1,19 @@
 export const rupees = "₹"
 
-//  export const baseUrl = "https://task.sabrikhidmat.org"
-//  export const baseUrl = "https://bike.vpayout.com"
- export const baseUrl = "https://admin.sunlottery.fun"
-//  export const baseUrl = "https://admin.gameszone.life"
+export const baseUrl = "https://admin.sunlottery.fun"
 export const fron_end_main_domain = "https://sunlottery.fun"
 
-// export const domain = "http://192.168.18.183:9000"
-// export const domain = "https://app.ferryinfotech.in/"
-export const domain = "https://aviator-backend-p1xp.onrender.com/"
-// export const domain = "https://app.sunlottery.fun/"
+// export const domain = "https://aviator-backend-p1xp.onrender.com/"
+export const domain = "https://sunlotterycountdown.onrender.com/"
+// export const domain = "http://localhost:9000/"
+
 export const support_mail = `support@sunlottrey.fun`
 export const telegram_url = `https://t.me/SunLottaryOfficial`
 
 export const endpoint ={
   login:`${baseUrl}/api/user_login`,
+  send_otp:`${baseUrl}/api/forget-password`,
+  veryfy_otp:`${baseUrl}/api/user-otp-verify`,
   signup:`${baseUrl}/api/user_register`,
   userwallet:`${baseUrl}/api/userwallet`,
   top11winner:`https://game-zone-sql.onrender.com/api/v1/topw11winningInformation`,
@@ -41,7 +40,6 @@ export const endpoint ={
   add_bank_details:`${baseUrl}/api/bank-add`,
   get_bank_list:`${baseUrl}/api/user-bank-details`,
   promotion_data:`https://game-zone-sql.onrender.com/api/v1/promotiondata`,
-  // promotion_data:`http://localhost:8000/api/v1/promotiondata`,
   all_withdrawl_user_list:`${baseUrl}/api/widthrol-user-list`,
   recharge_call_bakc : `${baseUrl}/api/deposits-user-request`,
   // https://admin.sunlottery.fun/api/deposits-user-request?userid=1&transectionid=17124028929291

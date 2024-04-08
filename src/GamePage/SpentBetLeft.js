@@ -1,10 +1,10 @@
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import {
   Box,
   Button,
   CircularProgress,
-  Slide,
   Stack,
-  Switch,
+  Switch
 } from "@mui/material";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -12,18 +12,18 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import { useQueryClient } from "react-query";
-import { gray } from "./color";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { endpoint, rupees } from "../services/urls";
 import { useDispatch, useSelector } from "react-redux";
 import { get_user_data_fn } from "../services/apicalling";
+import { endpoint, rupees } from "../services/urls";
+import { gray } from "./color";
 
 const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   const dispatch = useDispatch();
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
-
+  const first_rechange =
+  aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge
   const client = useQueryClient();
   const spent_amount1 = localStorage.getItem("spent_amount1");
   const amount_total =
@@ -31,6 +31,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   const pre_amount = Number(
     Number(amount_total?.wallet || 0) + Number(amount_total?.winning || 0)
   ).toFixed(2);
+
 
   const [loding, setloding] = useState(false);
   // const logindata = localStorage.getItem("aviator_data");
@@ -55,6 +56,11 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   }, []);
 
   const spentBit = async () => {
+
+    if(Number(first_rechange) !== 1){
+      return toast("You must be sure that , your first deposit is done.");
+    }
+   
     setloding(true);
     const reqbody = {
       userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,

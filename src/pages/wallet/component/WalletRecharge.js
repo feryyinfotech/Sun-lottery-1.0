@@ -38,7 +38,7 @@ import { get_user_data_fn } from "../../../services/apicalling";
 import CryptoJS from "crypto-js";
 function WalletRecharge() {
   const [t_id, setT_id] = React.useState();
-  const [callBackResponse, setCallBackResponse] = React.useState();
+  const [callBackResponse, setCallBackResponse] = React.useState({payment_status:"NO"});
   // console.log(uuid.v4(), "This is response");
   let intervalId;
   const dispatch = useDispatch();

@@ -19,13 +19,20 @@ import { useSelector } from "react-redux";
 import WinThreeMin from "./component/WinOneMin/WinThreeMin";
 import WinFiveMin from "./component/WinOneMin/WinFiveMin";
 import { MyHistoryFn } from "../../services/apicalling";
-import CryptoJS from 'crypto-js'
+import CryptoJS from "crypto-js";
+import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
+
 function Win() {
   const navigate = useNavigate();
-  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
-  const user_id =login_data && JSON.parse(login_data)?.UserID;
+  const login_data =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null;
+  const user_id = login_data && JSON.parse(login_data)?.UserID;
   const [Tab, setTab] = useState(1);
-
 
   const walletamount = async () => {
     try {
@@ -38,7 +45,6 @@ function Win() {
       console.log(e);
     }
   };
- 
 
   const [opendialogbox, setOpenDialogBox] = useState(false);
   const isAppliedbet = localStorage.getItem("betApplied");
@@ -65,10 +71,15 @@ function Win() {
     }, 1000);
   }, [dummycounter]);
 
+
   return (
     <Layout footer={false}>
       <Container sx={styles.root}>
         <Box sx={{ padding: 2 }}>
+          <KeyboardArrowLeftOutlinedIcon
+            className="!text-white !cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
           <Stack direction="row" sx={styles.depositWithdrawContainer}>
             <Box
               sx={{
@@ -187,7 +198,7 @@ function Win() {
         {Tab === 1 && <WinOneMin gid="1" />}
         {Tab === 2 && <WinThreeMin gid="2" />}
         {Tab === 3 && <WinFiveMin gid="3" />}
-          {/* opendialogbox */}
+        {/* opendialogbox */}
         {opendialogbox && (
           <Dialog
             open={opendialogbox}
@@ -198,7 +209,7 @@ function Win() {
               },
             }}
           >
-            <WinLossPopup gid={isAppliedbet?.split("_")?.[0]}/>
+            <WinLossPopup gid={isAppliedbet?.split("_")?.[0]} />
           </Dialog>
         )}
         <CustomCircularProgress isLoading={isLoading} />

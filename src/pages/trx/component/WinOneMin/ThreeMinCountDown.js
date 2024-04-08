@@ -30,97 +30,92 @@ import Policy from "../policy/Policy";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-const TwoMinCountDown = ({ fk }) => {
+const ThreeMinCountDown = ({fk}) => {
   const socket = useSocket();
   const dispatch = useDispatch();
   const client = useQueryClient();
-  const [three_min_time, setThree_min_time] = useState("0_0");
-  const [isImageChange, setIsImageChange] = useState("1_2_3_4_5");
+  const audioRefMusic = React.useRef(null);
+  const audioRefMusiclast = React.useRef(null);
   const [poicy, setpoicy] = React.useState(false);
-
+  const [one_min_time, setOne_min_time] = useState("0_0");
+  const [isImageChange, setIsImageChange] = useState("1_2_3_4_5");
   const img1 = Number(isImageChange?.split("_")[0]);
   const img2 = Number(isImageChange?.split("_")[1]);
   const img3 = Number(isImageChange?.split("_")[2]);
   const img4 = Number(isImageChange?.split("_")[3]);
   const img5 = Number(isImageChange?.split("_")[4]);
-  const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
+  const next_step = useSelector((state) => state.aviator.next_step)
 
+  const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
   React.useEffect(() => {
     setIsImageChange(changeImages());
   }, []);
-  const next_step = useSelector((state) => state.aviator.next_step);
 
   const show_this_three_min_time_sec = React.useMemo(
-    () => String(three_min_time?.split("_")?.[1]).padStart(2, "0"),
-    [three_min_time]
+    () => String(one_min_time?.split("_")?.[1]).padStart(2, "0"),
+    [one_min_time]
   );
-
   const show_this_three_min_time_min = React.useMemo(
-    () => String(three_min_time?.split("_")?.[0]).padStart(2, "0"),
-    [three_min_time]
+    () => String(one_min_time?.split("_")?.[0]).padStart(2, "0"),
+    [one_min_time]
   );
-
   const handleClickOpenpoicy = () => {
     setpoicy(true);
   };
   const handleClosepolicy = () => {
     setpoicy(false);
   };
-
   React.useEffect(() => {
-    const handleThreeMin = (threemin) => {
-      setThree_min_time(threemin);
-      fk.setFieldValue("show_this_one_min_time", threemin);
+    const handleFiveMin = (fivemin) => {
+      setOne_min_time(fivemin);
+      fk.setFieldValue("show_this_one_min_time",fivemin)
       if (
-        (threemin?.split("_")?.[1] === "5" ||
-          threemin?.split("_")?.[1] === "4" ||
-          threemin?.split("_")?.[1] === "3" ||
-          threemin?.split("_")?.[1] === "2") &&
-        threemin?.split("_")?.[0] === "0"
+        (fivemin?.split("_")?.[1] === "5" ||
+          fivemin?.split("_")?.[1] === "4" ||
+          fivemin?.split("_")?.[1] === "3" ||
+          fivemin?.split("_")?.[1] === "2") &&
+        fivemin?.split("_")?.[0] === "0"
       )
         handlePlaySound();
-      if (
-        threemin?.split("_")?.[1] === "1" &&
-        threemin?.split("_")?.[0] === "0"
-      )
+      if (fivemin?.split("_")?.[1] === "1" && fivemin?.split("_")?.[0] === "0")
         handlePlaySoundLast();
+
       if (
-        Number(threemin?.split("_")?.[1]) <= 10 && // 1 index means second
-        threemin?.split("_")?.[0] === "0" // 0 index means min
+        Number(fivemin?.split("_")?.[1]) <= 10 && // this is for sec
+        fivemin?.split("_")?.[0] === "0" // this is for minut
       ) {
         fk.setFieldValue("openTimerDialogBoxOneMin", true);
       }
-      if (threemin?.split("_")?.[1] === "59") {
+      if (fivemin?.split("_")?.[1] === "59") {
         fk.setFieldValue("openTimerDialogBoxOneMin", false);
       }
       if (
-        threemin?.split("_")?.[1] === "25" &&
-        threemin?.split("_")?.[0] === "0"
+        fivemin?.split("_")?.[1] === "40" && // this is for sec
+        fivemin?.split("_")?.[0] === "0" // this is for minut
       ) {
         // oneMinCheckResult();
         // oneMinColorWinning();
       }
       if (
-        threemin?.split("_")?.[1] === "0" &&
-        threemin?.split("_")?.[0] === "0"
+        fivemin?.split("_")?.[1] === "0" &&
+        fivemin?.split("_")?.[0] === "0"
       ) {
-        client.refetchQueries("gamehistory");
-        client.refetchQueries("walletamount");
-        client.refetchQueries("gamehistory_chart");
-        client.refetchQueries("myhistory");
-        client.refetchQueries("myAllhistory");
-        dispatch(dummycounterFun());
+        // client.refetchQueries("gamehistory");
+        // client.refetchQueries("gamehistory_chart");
+        // client.refetchQueries("myhistory");
+        // client.refetchQueries("myAllhistory");
+        // dispatch(dummycounterFun());
       }
     };
 
-    socket.on("threemin", handleThreeMin);
+    socket.on("fivemin", handleFiveMin);
 
     return () => {
-      socket.off("threemin", handleThreeMin);
+      socket.off("fivemin", handleFiveMin);
     };
   }, []);
 
-  const audioRefMusic = React.useRef(null);
+
   const handlePlaySound = async () => {
     try {
       if (audioRefMusic?.current?.pause) {
@@ -133,7 +128,7 @@ const TwoMinCountDown = ({ fk }) => {
       console.error("Error during play:", error);
     }
   };
-  const audioRefMusiclast = React.useRef(null);
+
   const handlePlaySoundLast = async () => {
     try {
       if (audioRefMusiclast?.current?.pause) {
@@ -160,7 +155,7 @@ const TwoMinCountDown = ({ fk }) => {
             </audio>
           </>
         );
-      }, [audioRefMusic, audioRefMusiclast])}
+      }, [audioRefMusiclast, audioRefMusic])}
       <Box
         sx={{
           display: "flex",
@@ -255,10 +250,10 @@ const TwoMinCountDown = ({ fk }) => {
                 </>
               );
             }, [show_this_three_min_time_min])}
-            <Box className={"!text-white !font-bold !text-lg"}>:</Box>
             {React.useMemo(() => {
               return (
                 <>
+                  <Box className={"!text-white !font-bold !text-lg"}>:</Box>
                   <Box className="timerBox">
                     {show_this_three_min_time_sec?.substring(0, 1)}
                   </Box>
@@ -270,7 +265,7 @@ const TwoMinCountDown = ({ fk }) => {
             }, [show_this_three_min_time_sec])}
           </Stack>
           <Typography variant="h3" color="initial" className="winTexttwo">
-            {Number(next_step)?.toString()?.padStart(7, "0")}
+          {(Number(next_step))?.toString()?.padStart(7,"0")}
           </Typography>
         </Box>
       </Box>
@@ -323,4 +318,4 @@ const TwoMinCountDown = ({ fk }) => {
   );
 };
 
-export default TwoMinCountDown;
+export default ThreeMinCountDown;

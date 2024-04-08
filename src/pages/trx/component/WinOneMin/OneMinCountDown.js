@@ -27,39 +27,38 @@ import { dummycounterFun } from "../../../../redux/slices/counterSlice";
 import { changeImages } from "../../../../services/schedular";
 import { endpoint } from "../../../../services/urls";
 import Policy from "../policy/Policy";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-const TwoMinCountDown = ({ fk }) => {
+const OneMinCountDown = ({ fk }) => {
   const socket = useSocket();
-  const dispatch = useDispatch();
   const client = useQueryClient();
-  const [three_min_time, setThree_min_time] = useState("0_0");
+  const [one_min_time, setOne_min_time] = useState(0);
+  const show_this_one_min_time = String(one_min_time).padStart(2, "0");
   const [isImageChange, setIsImageChange] = useState("1_2_3_4_5");
-  const [poicy, setpoicy] = React.useState(false);
-
   const img1 = Number(isImageChange?.split("_")[0]);
   const img2 = Number(isImageChange?.split("_")[1]);
   const img3 = Number(isImageChange?.split("_")[2]);
   const img4 = Number(isImageChange?.split("_")[3]);
   const img5 = Number(isImageChange?.split("_")[4]);
+  const dispatch = useDispatch();
+  const audioRefMusic = React.useRef(null);
+  const audioRefMusiclast = React.useRef(null);
+  const next_step = useSelector((state) => state.aviator.next_step)
   const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
-
   React.useEffect(() => {
     setIsImageChange(changeImages());
   }, []);
-  const next_step = useSelector((state) => state.aviator.next_step);
 
-  const show_this_three_min_time_sec = React.useMemo(
-    () => String(three_min_time?.split("_")?.[1]).padStart(2, "0"),
-    [three_min_time]
-  );
+  React.useEffect(() => {
+    if (show_this_one_min_time === "05") {
+      // oneMinCheckResult();
+      // oneMinColorWinning();
+    }
+  }, [show_this_one_min_time]);
 
-  const show_this_three_min_time_min = React.useMemo(
-    () => String(three_min_time?.split("_")?.[0]).padStart(2, "0"),
-    [three_min_time]
-  );
-
+  const [poicy, setpoicy] = React.useState(false);
   const handleClickOpenpoicy = () => {
     setpoicy(true);
   };
@@ -68,59 +67,33 @@ const TwoMinCountDown = ({ fk }) => {
   };
 
   React.useEffect(() => {
-    const handleThreeMin = (threemin) => {
-      setThree_min_time(threemin);
-      fk.setFieldValue("show_this_one_min_time", threemin);
-      if (
-        (threemin?.split("_")?.[1] === "5" ||
-          threemin?.split("_")?.[1] === "4" ||
-          threemin?.split("_")?.[1] === "3" ||
-          threemin?.split("_")?.[1] === "2") &&
-        threemin?.split("_")?.[0] === "0"
-      )
+    const handleOneMin = (onemin) => {
+      setOne_min_time(onemin);
+      fk.setFieldValue("show_this_one_min_time", onemin);
+      if (onemin === 5 || onemin === 4 || onemin === 3 || onemin === 2) {
         handlePlaySound();
-      if (
-        threemin?.split("_")?.[1] === "1" &&
-        threemin?.split("_")?.[0] === "0"
-      )
-        handlePlaySoundLast();
-      if (
-        Number(threemin?.split("_")?.[1]) <= 10 && // 1 index means second
-        threemin?.split("_")?.[0] === "0" // 0 index means min
-      ) {
+      }
+      if (onemin === 1) handlePlaySoundLast();
+
+      if (onemin <= 10) {
         fk.setFieldValue("openTimerDialogBoxOneMin", true);
       }
-      if (threemin?.split("_")?.[1] === "59") {
+      if (onemin === 0) {
+        // client.refetchQueries("myhistory");
+        // client.refetchQueries("gamehistory");
+        // client.refetchQueries("gamehistory_chart");
+        // client.refetchQueries("myAllhistory");
+        // dispatch(dummycounterFun());
         fk.setFieldValue("openTimerDialogBoxOneMin", false);
       }
-      if (
-        threemin?.split("_")?.[1] === "25" &&
-        threemin?.split("_")?.[0] === "0"
-      ) {
-        // oneMinCheckResult();
-        // oneMinColorWinning();
-      }
-      if (
-        threemin?.split("_")?.[1] === "0" &&
-        threemin?.split("_")?.[0] === "0"
-      ) {
-        client.refetchQueries("gamehistory");
-        client.refetchQueries("walletamount");
-        client.refetchQueries("gamehistory_chart");
-        client.refetchQueries("myhistory");
-        client.refetchQueries("myAllhistory");
-        dispatch(dummycounterFun());
-      }
     };
-
-    socket.on("threemin", handleThreeMin);
-
+    socket.on("onemin", handleOneMin);
     return () => {
-      socket.off("threemin", handleThreeMin);
+      socket.off("onemin", handleOneMin);
     };
   }, []);
 
-  const audioRefMusic = React.useRef(null);
+
   const handlePlaySound = async () => {
     try {
       if (audioRefMusic?.current?.pause) {
@@ -133,7 +106,7 @@ const TwoMinCountDown = ({ fk }) => {
       console.error("Error during play:", error);
     }
   };
-  const audioRefMusiclast = React.useRef(null);
+
   const handlePlaySoundLast = async () => {
     try {
       if (audioRefMusiclast?.current?.pause) {
@@ -242,35 +215,23 @@ const TwoMinCountDown = ({ fk }) => {
           <Typography variant="h3" color="initial" className="winTextone">
             Time remaining
           </Typography>
-          <Stack direction="row">
-            {React.useMemo(() => {
-              return (
-                <>
-                  <Box className="timerBoxone">
-                    {show_this_three_min_time_min?.substring(0, 1)}
-                  </Box>
-                  <Box className="timerBox">
-                    {show_this_three_min_time_min?.substring(1, 2)}
-                  </Box>
-                </>
-              );
-            }, [show_this_three_min_time_min])}
-            <Box className={"!text-white !font-bold !text-lg"}>:</Box>
-            {React.useMemo(() => {
-              return (
-                <>
-                  <Box className="timerBox">
-                    {show_this_three_min_time_sec?.substring(0, 1)}
-                  </Box>
-                  <Box className="timerBoxfour">
-                    {show_this_three_min_time_sec?.substring(1, 2)}
-                  </Box>
-                </>
-              );
-            }, [show_this_three_min_time_sec])}
-          </Stack>
+          {React.useMemo(() => {
+            return (
+              <Stack direction="row">
+                <Box className="timerBoxone">0</Box>
+                <Box className="timerBox">0</Box>
+                <Box className={"!text-white !font-bold !text-lg"}>:</Box>
+                <Box className="timerBox">
+                  {show_this_one_min_time?.substring(0, 1)}
+                </Box>
+                <Box className="timerBoxfour">
+                  {show_this_one_min_time?.substring(1, 2)}
+                </Box>
+              </Stack>
+            );
+          }, [show_this_one_min_time])}
           <Typography variant="h3" color="initial" className="winTexttwo">
-            {Number(next_step)?.toString()?.padStart(7, "0")}
+            {(Number(next_step))?.toString()?.padStart(7, "0")}
           </Typography>
         </Box>
       </Box>
@@ -285,7 +246,10 @@ const TwoMinCountDown = ({ fk }) => {
             },
           }}
         >
-          <div className="flex gap-2 justify-cente !bg-black !bg-opacity-5">
+          <div
+            className="flex gap-2 justify-cente !bg-black !bg-opacity-5"
+            sx={{ width: "100%" }}
+          >
             <div
               style={{
                 fontSize: 200,
@@ -299,7 +263,7 @@ const TwoMinCountDown = ({ fk }) => {
                 color: "white",
               }}
             >
-              {show_this_three_min_time_sec?.substring(0, 1)}
+              {show_this_one_min_time?.substring(0, 1)}
             </div>
             <div
               style={{
@@ -314,7 +278,7 @@ const TwoMinCountDown = ({ fk }) => {
                 color: "white",
               }}
             >
-              {show_this_three_min_time_sec?.substring(1, 2)}
+              {show_this_one_min_time?.substring(1, 2)}
             </div>
           </div>
         </Dialog>
@@ -323,4 +287,4 @@ const TwoMinCountDown = ({ fk }) => {
   );
 };
 
-export default TwoMinCountDown;
+export default OneMinCountDown;

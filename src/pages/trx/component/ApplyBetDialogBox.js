@@ -36,11 +36,6 @@ const ApplyBetDialogBox = ({
   gid,
 }) => {
   const dispatch = useDispatch();
-  const [value, setValue] = useState(1);
-  const [Rules, setRules] = useState(false);
-  const [calculated_value, setcalculated_value] = useState(1);
-  const [loding, setLoding] = useState(false);
-  
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
@@ -56,7 +51,10 @@ const ApplyBetDialogBox = ({
   const first_rechange =
     aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
   const user_id = login_data && JSON.parse(login_data)?.UserID;
-
+  const [value, setValue] = useState(1);
+  const [Rules, setRules] = useState(false);
+  const [calculated_value, setcalculated_value] = useState(1);
+  const [loding, setLoding] = useState(false);
 
   React.useEffect(() => {
     !aviator_login_data && get_user_data_fn(dispatch);
@@ -288,11 +286,11 @@ const ApplyBetDialogBox = ({
           className="!text-white"
           variant="text"
           color="primary"
-          onClick={() => {
-            Number(first_rechange) === 1
-              ? betFunctionStart()
-              : toast("You must be sure that , your first deposit is done.");
-          }}
+          // onClick={() => {
+          //   Number(first_rechange) === 1
+          //     ? betFunctionStart()
+          //     : toast("You must be sure that , your first deposit is done.");
+          // }}
           loding={true}
         >
           Confirm

@@ -9,55 +9,80 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { NavLink, useNavigate } from "react-router-dom";
 import OtpInput from "react-otp-input";
-import { storeCookies } from "../../../Shared/CookieStorage";
+import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { ForgetPasswordSchemaValidation } from "../../../Shared/Validation";
 import logo from "../../../assets/images/logo.png";
 import poster from "../../../assets/images/poster2.jpg";
 import { endpoint } from "../../../services/urls";
-import CryptoJS from 'crypto-js'
 function ForgetPassword() {
   const [loding, setloding] = useState(false);
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
+  const [openOTPBox, setopenOTPBox] = useState(false);
   const initialValue = {
     mobile: "",
+    password: "",
   };
 
   const fk = useFormik({
     initialValues: initialValue,
     validationSchema: ForgetPasswordSchemaValidation,
     onSubmit: () => {
-      loginFunction(fk.values);
+      openOTPBox
+        ? veryFyOTPAndChangePassword(fk.values)
+        : loginFunction(fk.values);
     },
   });
 
+  const veryFyOTPAndChangePassword = async (reqbody) => {
+    setloding(true);
+    try {
+      const response = await axios.get(
+        `${endpoint.veryfy_otp}?mobile=${reqbody.mobile}&otp=${otp}&password=${reqbody.password}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+      if (response?.data?.msg === "Successfully Otp Verify") {
+        setopenOTPBox(false);
+        fk.handleReset();
+        navigate("/");
+      }
+      toast.success(response?.data?.msg);
+    } catch (e) {
+      toast.error(e?.message);
+      console.error(e);
+    }
+    setloding(false);
+  };
   const loginFunction = async (reqbody) => {
     setloding(true);
     try {
-      const response = await axios.post(endpoint.login, reqbody, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      });
-
-      toast.success(response?.data?.msg);
-      console.log(response);
-      if (response?.data?.error === "200") {
-        const value = CryptoJS.AES.encrypt(JSON.stringify(response?.data), "anand")?.toString();
-        localStorage.setItem("logindataen", value);
-        sessionStorage.setItem("isAvailableUser", true);
-        sessionStorage.setItem("isAvailableCricketUser", true);
-        // get_user_data(response?.data?.UserID);
-        setloding(false);
-        storeCookies();
-        navigate("/dashboard");
-        window.location.reload();
+      const response = await axios.get(
+        `${endpoint.send_otp}?mobile=${reqbody.mobile}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+      if (response?.data?.msg === "Successfully Otp Send") {
+        setopenOTPBox(true);
+      }
+      if (response?.data?.otp) {
+        toast.success(
+          response?.data?.msg + " " + "OTP is: " + response?.data?.otp
+        );
+      } else {
+        toast.success(response?.data?.msg);
       }
     } catch (e) {
       toast.error(e?.message);
@@ -92,7 +117,7 @@ function ForgetPassword() {
           </Box>
           <Box
             sx={{
-              mt: "6vh",
+              mt: "6vh",   
               background: "white",
               borderRadius: "10px",
               padding: "20px 10px",
@@ -112,6 +137,10 @@ function ForgetPassword() {
               border: "1px solid rgba(255, 255, 255, 0.075)",
             }}
           >
+            <div className="error text-center">
+              After sent OTP , Please do not refresh your page.{" "}
+              <span className="!text-green-500">Thank You</span>
+            </div>
             <Typography variant="body1" color="initial">
               Forget Password{" "}
             </Typography>
@@ -129,54 +158,70 @@ function ForgetPassword() {
             >
               <FormControl fullWidth sx={{ mt: 2 }}>
                 <Stack direction="row" className="loginlabel">
-                  <Typography variant="h3">Enter Mobile No</Typography>
+                  <Typography variant="h3">Enter email or mobile no</Typography>
                 </Stack>
                 <>
                   <TextField
                     id="mobile"
                     type="number"
                     name="mobile"
-                    placeholder="Enter mobile no"
+                    placeholder="Enter email or mobile no"
                     className="loginfields"
                     value={fk.values.email}
                     onChange={fk.handleChange}
                     onKeyDown={(e) => e.key === "Enter" && fk.handleSubmit()}
                   />
-                  <p className="!text-sm text-right">
-                    <span
-                      className="!cursor-pointer"
-                      onClick={() => navigate("/")}
-                    >
-                      Return to Login
-                    </span>
-                  </p>
+
                   {fk.touched.mobile && fk.errors.mobile && (
                     <div className="error">{fk.errors.mobile}</div>
                   )}
                 </>
-                <div className="!flex !justify-center">
-                  <OtpInput
-                    value={otp}
-                    onChange={setOtp}
-                    numInputs={6}
-                    renderSeparator={<span style={{ width: "10px" }}> </span>}
-                    renderInput={(props) => (
-                      <input
-                        {...props}
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          background: "transparent", // Set background to transparent
-                          color: "blue", // Set text color to blue
-                          border: "2px solid white",
-                          textAlign: "center",
-                        }}
+                {openOTPBox && (
+                  <>
+                    <>
+                      <Stack direction="row" className="loginlabel mt-5">
+                        <Typography variant="h3">Enter New Password</Typography>
+                      </Stack>
+                      <TextField
+                        id="password"
+                        type="text"
+                        name="password"
+                        placeholder="Enter Password"
+                        className="loginfields"
+                        value={fk.values.password}
+                        onChange={fk.handleChange}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && fk.handleSubmit()
+                        }
                       />
-                    )}
-                  />
-                </div>
+                    </>
+                    <div className="!flex !justify-center mt-3">
+                      <OtpInput
+                        value={otp}
+                        onChange={setOtp}
+                        numInputs={6}
+                        renderSeparator={
+                          <span style={{ width: "10px" }}> </span>
+                        }
+                        renderInput={(props) => (
+                          <input
+                            {...props}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              background: "transparent", // Set background to transparent
+                              color: "blue", // Set text color to blue
+                              border: "2px solid white",
+                              textAlign: "center",
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  </>
+                )}
               </FormControl>
-              <div className="flex justify-center !mt-5">
+              <div className="flex flex-col justify-center !mt-5">
                 <Button
                   type="submit"
                   value="Submit"
@@ -184,8 +229,16 @@ function ForgetPassword() {
                   className="btnLogin"
                   onClick={fk.handleSubmit}
                 >
-                  Send OTP
+                  {openOTPBox ? "Submit" : "Send OTP"}
                 </Button>
+                <p className="!text-sm text-right">
+                  <span
+                    className="!cursor-pointer"
+                    onClick={() => navigate("/")}
+                  >
+                    Return to Login
+                  </span>
+                </p>
               </div>
               <Stack direction="row" className="loginbtnbox" mt={2}></Stack>
               <CustomCircularProgress isLoading={loding} />

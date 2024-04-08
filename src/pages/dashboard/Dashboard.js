@@ -35,7 +35,7 @@ import { gray, zubgback, zubgbackgrad, zubgmid } from "../../Shared/color";
 import aviator_game_image from "../../assets/aviator_game_image.png";
 import one from "../../assets/images/1.jpg";
 import two from "../../assets/images/2.jpg";
-import three from "../../assets/images/3.jpg";
+import three from "../../assets/images/123.png";
 import cash from "../../assets/images/cash-withdrawal.png";
 import deposit from "../../assets/images/deposit (1).png";
 import megaphone from "../../assets/images/megaphone.png";
@@ -605,9 +605,13 @@ function Dashboard() {
                         {i?.email?.split("@")[0]?.substring(0, 1)}
                       </Avatar>
                       <Typography variant="body1">
-                        {i?.email?.split("@")[0]?.substring(0, 3) +
-                          "**" +
-                          i?.email?.split("@")[0]?.substring(3, 5)}
+                        {i?.email
+                          ? i.email.split("@")[0].substring(0, 2) +
+                            "**" +
+                            (i.email.split("@")[0].length > 2
+                              ? i.email.split("@")[0].substring(2, 4)
+                              : "")
+                          : "**"}
                       </Typography>
                     </Stack>
                     <Stack direction="row" sx={styles.wininfooutertwo}>
@@ -739,9 +743,13 @@ function Dashboard() {
                         {i?.email?.split("@")[0]?.substring(0, 1)}
                       </Avatar>
                       <Typography variant="body1">
-                        {i?.email?.split("@")[0]?.substring(0, 3) +
-                          "**" +
-                          i?.email?.split("@")[0]?.substring(3, 4)}
+                        {i?.email
+                          ? i.email.split("@")[0].substring(0, 2) +
+                            "**" +
+                            (i.email.split("@")[0].length > 2
+                              ? i.email.split("@")[0].substring(2, 4)
+                              : "")
+                          : "**"}
                       </Typography>
                     </Stack>
                     <Stack direction="row" sx={styles.wininfooutertwo}>

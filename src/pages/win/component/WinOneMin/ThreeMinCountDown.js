@@ -93,14 +93,15 @@ const ThreeMinCountDown = ({fk}) => {
         fivemin?.split("_")?.[1] === "40" && // this is for sec
         fivemin?.split("_")?.[0] === "0" // this is for minut
       ) {
-        oneMinCheckResult();
-        oneMinColorWinning();
+        // oneMinCheckResult();
+        // oneMinColorWinning();
       }
       if (
         fivemin?.split("_")?.[1] === "0" &&
         fivemin?.split("_")?.[0] === "0"
       ) {
         client.refetchQueries("gamehistory");
+        client.refetchQueries("walletamount");
         client.refetchQueries("gamehistory_chart");
         client.refetchQueries("myhistory");
         client.refetchQueries("myAllhistory");
@@ -115,23 +116,6 @@ const ThreeMinCountDown = ({fk}) => {
     };
   }, []);
 
-  const oneMinCheckResult = async () => {
-    try {
-      await axios.get(`${endpoint.check_result}`);
-     
-    } catch (e) {
-      toast(e?.message);
-      console.log(e);
-    }
-  };
-  const oneMinColorWinning = async () => {
-    try {
-      await axios.get(`${endpoint.color_winning}?id=3&gid=3`);
-    } catch (e) {
-      toast(e?.message);
-      console.log(e);
-    }
-  };
 
   const handlePlaySound = async () => {
     try {

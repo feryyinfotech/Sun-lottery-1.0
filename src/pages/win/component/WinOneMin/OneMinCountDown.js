@@ -53,8 +53,8 @@ const OneMinCountDown = ({ fk }) => {
 
   React.useEffect(() => {
     if (show_this_one_min_time === "05") {
-      oneMinCheckResult();
-      oneMinColorWinning();
+      // oneMinCheckResult();
+      // oneMinColorWinning();
     }
   }, [show_this_one_min_time]);
 
@@ -80,6 +80,7 @@ const OneMinCountDown = ({ fk }) => {
       }
       if (onemin === 0) {
         client.refetchQueries("myhistory");
+        client.refetchQueries("walletamount");
         client.refetchQueries("gamehistory");
         client.refetchQueries("gamehistory_chart");
         client.refetchQueries("myAllhistory");
@@ -93,24 +94,6 @@ const OneMinCountDown = ({ fk }) => {
     };
   }, []);
 
-  const oneMinCheckResult = async () => {
-    try {
-      await axios.get(`${endpoint.check_result}`);
-      
-    } catch (e) {
-      toast(e?.message);
-      console.log(e);
-    }
-  };
-  const oneMinColorWinning = async () => {
-    console.log("Color winning api hit now")
-    try {
-      await axios.get(`${endpoint.color_winning}?id=1&gid=1`);
-    } catch (e) {
-      toast(e?.message);
-      console.log(e);
-    }
-  };
 
   const handlePlaySound = async () => {
     try {
