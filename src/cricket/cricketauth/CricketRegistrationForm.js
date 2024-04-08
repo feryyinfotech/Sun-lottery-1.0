@@ -1,48 +1,23 @@
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Container,
-  Dialog,
-  FormControl,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import CopyAllIcon from "@mui/icons-material/CopyAll";
+import { Box, Container, Dialog, Typography } from "@mui/material";
 import axios from "axios";
+import { Button } from "@mui/material";
+import copy from "clipboard-copy";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
 import { signupSchemaValidataon } from "../../Shared/Validation";
-import { zubgbackgrad } from "../../Shared/color";
 import logo from "../../assets/images/club-8-copyright.png";
 import poster from "../../assets/images/poster6.jpg";
 import { endpoint } from "../../services/urls";
-import CopyAllIcon from "@mui/icons-material/CopyAll";
-import copy from "clipboard-copy";
 function CricketRegistrationForm() {
   const navigate = useNavigate();
   const [openDialogBox, setOpenDialogBox] = useState(false);
   const [id_pass, set_id_pass] = useState(" _ ");
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [show_confirm_password, set_show_confirm_password] =
-    React.useState(false);
   const [loding, setloding] = useState(false);
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handle_confirm_ClickShowPassword = () =>
-    set_show_confirm_password(!show_confirm_password);
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
   const functionTOCopy = (value) => {
     copy(value);
     toast.success("Copied to clipboard!");
@@ -168,7 +143,6 @@ function CricketRegistrationForm() {
               onSubmit={fk.handleSubmit}
             >
               <Box mt={3} className="">
-              
                 <p className="!text-white">Service Provider:</p>
                 <div className="grid grid-cols-2 !border-2 !border-blue-100 !p-1">
                   <p
@@ -248,6 +222,16 @@ function CricketRegistrationForm() {
                   </a>
                 </div>
               </Box>
+              <div className="!flex !justify-center !mt-5">
+              <Button
+                to="/cricket/registration"
+                className="playnow !cursor-pointer !bg-[#00B55E]"
+                role="Button"
+                // sx={style.button}
+              >
+                Open Now
+              </Button>
+              </div>
               {/* <Box mt={2}>
                 <FormControl fullWidth>
                   <Stack direction="row" className="loginlabel">

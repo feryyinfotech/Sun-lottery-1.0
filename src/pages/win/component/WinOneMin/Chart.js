@@ -314,7 +314,7 @@ const Chart = ({ gid }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Box>
-      <CustomCircularProgress isLoading={isLoading} />
+      {/* <CustomCircularProgress isLoading={isLoading} /> */}
     </Box>
   );
 };

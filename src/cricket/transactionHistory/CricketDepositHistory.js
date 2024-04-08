@@ -1,3 +1,4 @@
+import CryptoJS from 'crypto-js'
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";

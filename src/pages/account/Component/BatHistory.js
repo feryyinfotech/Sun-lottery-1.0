@@ -24,7 +24,7 @@ import Layout from "../../../component/Layout/Layout";
 import { MyHistoryFn, getAllBetsAviator } from "../../../services/apicalling";
 import { rupees } from "../../../services/urls";
 import aviator_game_image from "../../../assets/aviator_game_image.png";
-
+import CryptoJS from 'crypto-js'
 function BatHistorys() {
   const [selectedGame, setSelectedGame] = React.useState("Lottery");
   const [selectedGameOption, setselectedGameOption] = React.useState("");
@@ -34,8 +34,8 @@ function BatHistorys() {
     navigate(-1);
   };
 
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data).UserID;
+  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
+  const user_id = login_data && JSON.parse(login_data)?.UserID;
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [page, setPage] = React.useState(0);
   const handleChangePage = (event, newPage) => {

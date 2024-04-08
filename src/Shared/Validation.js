@@ -7,6 +7,19 @@ export const LoginEmailSchemaValidaton = Yup.object().shape({
     .min(3, "Password must be 3 characters at minimum")
     .required("Password is required"),
 });
+export const ForgetPasswordSchemaValidation = Yup.object().shape({
+  mobile: Yup.string()
+    .matches(/^[0-9]{10}$/, {
+      message:
+        "Invalid mobile number format. It must be a 10-digit number without dots.",
+    })
+    .test(
+      "no-dots",
+      "Dots are not allowed in the mobile number.",
+      (value) => !/\./.test(value)
+    )
+    .required("Mobile number is required"),
+});
 export const LoginMobileSchemaValidaton = Yup.object().shape({
   pass: Yup.string()
     .min(3, "Password must be 3 characters at minimum")
@@ -68,7 +81,10 @@ export const withdrawAmountSchemaValidaton = Yup.object().shape({
 });
 
 export const withdraw_amount_validation_schema = Yup.object().shape({
-  amount: Yup.string().required("Amount is required"),
+  amount: Yup.number()
+    .required("Amount is required")
+    .min(110, "Amount must be greater than or equal to 110")
+    .max(50000, "Amount must be less than or equal to 50000"),
   description: Yup.string()
     .min(20, "Description must be 20 characters at minimum")
     .required("Password is required"),

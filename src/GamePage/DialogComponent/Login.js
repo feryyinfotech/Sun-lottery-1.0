@@ -5,7 +5,7 @@ import {
   MenuItem,
   Tab,
   Tabs,
-  TextField
+  TextField,
 } from "@mui/material";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -14,11 +14,8 @@ import toast from "react-hot-toast";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { endpoint } from "../../services/urls";
-
 const Login = () => {
   const logindata = localStorage.getItem("aviator_data");
-
-
   const [value, setValue] = React.useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const navigate = useNavigate();
@@ -52,20 +49,19 @@ const Login = () => {
 
   const loginFunction = async (reqbody) => {
     try {
-      const response = await axios.post(
-        `${endpoint.aviator_login}`,
-        reqbody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
+      const response = await axios.post(`${endpoint.aviator_login}`, reqbody, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       toast.success(response?.data?.message);
 
       if (response?.data?.success === "200") {
-        localStorage.setItem("aviator_data", JSON.stringify(response?.data?.data));
+        localStorage.setItem(
+          "aviator_data",
+          JSON.stringify(response?.data?.data)
+        );
         navigate("/playgame");
       }
     } catch (e) {
@@ -86,14 +82,10 @@ const Login = () => {
     };
   }
 
-  
-
-
-
   useEffect(() => {
     logindata && navigate("/playgame");
   }, []);
-  
+
   return (
     <div>
       <div className="flex justify-center">

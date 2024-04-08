@@ -17,10 +17,13 @@ export const endpoint ={
   login:`${baseUrl}/api/user_login`,
   signup:`${baseUrl}/api/user_register`,
   userwallet:`${baseUrl}/api/userwallet`,
+  top11winner:`https://game-zone-sql.onrender.com/api/v1/topw11winningInformation`,
+  openbannerUrl:`${baseUrl}/popup`,
   profiledata:`${baseUrl}/api/profileapi`,
   applybet:`${baseUrl}/api/bet`,
   game_history:`${baseUrl}/api/colour_result`,
   my_history:`${baseUrl}/api/getbet`,
+  my_history_all:`${baseUrl}/api/getbet-game-results`,
   check_result:`${baseUrl}/api/checkresult`,
   color_winning:`${baseUrl}/api/colour_winning`,
   cash_deposit:`${baseUrl}/api/deposit`,
@@ -38,7 +41,10 @@ export const endpoint ={
   add_bank_details:`${baseUrl}/api/bank-add`,
   get_bank_list:`${baseUrl}/api/user-bank-details`,
   promotion_data:`https://game-zone-sql.onrender.com/api/v1/promotiondata`,
-
+  // promotion_data:`http://localhost:8000/api/v1/promotiondata`,
+  all_withdrawl_user_list:`${baseUrl}/api/widthrol-user-list`,
+  recharge_call_bakc : `${baseUrl}/api/deposits-user-request`,
+  // https://admin.sunlottery.fun/api/deposits-user-request?userid=1&transectionid=17124028929291
   // aviator api's
   aviator_login:`${baseUrl}/api/aviator/login`,
   get_data_by_user_id:`${baseUrl}/api/userProfile`,

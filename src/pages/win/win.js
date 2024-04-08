@@ -16,16 +16,16 @@ import { endpoint } from "../../services/urls";
 import WinOneMin from "./component/WinOneMin/WinOneMin";
 import WinLossPopup from "./component/WinOneMin/WinLossPopup";
 import { useSelector } from "react-redux";
-
+import WinThreeMin from "./component/WinOneMin/WinThreeMin";
+import WinFiveMin from "./component/WinOneMin/WinFiveMin";
+import { MyHistoryFn } from "../../services/apicalling";
+import CryptoJS from 'crypto-js'
 function Win() {
   const navigate = useNavigate();
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data).UserID;
+  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
+  const user_id =login_data && JSON.parse(login_data)?.UserID;
   const [Tab, setTab] = useState(1);
-  const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
-    refetchOnMount: false,
-    refetchOnReconnect: true,
-  });
+
 
   const walletamount = async () => {
     try {
@@ -38,7 +38,7 @@ function Win() {
       console.log(e);
     }
   };
-  const amount = data?.data?.data || 0;
+ 
 
   const [opendialogbox, setOpenDialogBox] = useState(false);
   const isAppliedbet = localStorage.getItem("betApplied");
@@ -46,10 +46,16 @@ function Win() {
 
   const client = useQueryClient();
 
+  const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
+    refetchOnMount: false,
+    refetchOnReconnect: true,
+  });
+
+  const amount = data?.data?.data || 0;
+
   React.useEffect(() => {
     setTimeout(() => {
       if (isAppliedbet?.split("_")?.[1] === String(true)) {
-        client.refetchQueries("my_history_win_loss");
         setOpenDialogBox(true);
         setTimeout(() => {
           setOpenDialogBox(false);
@@ -77,7 +83,7 @@ function Win() {
                   src={deposit}
                   alt="Deposit"
                   sx={styles.depositWithdrawIcon}
-                  // onClick={() => navigate("/wallet/Recharge")}
+                  onClick={() => navigate("/wallet/Recharge")}
                 />
               </Box>
               <Typography
@@ -110,7 +116,7 @@ function Win() {
             >
               <Box className="serv-item">
                 <Box
-                  // onClick={() => navigate("/Withdrawal")}
+                  onClick={() => navigate("/Withdrawal")}
                   component="img"
                   src={cash}
                   alt="Withdraw"
@@ -179,8 +185,9 @@ function Win() {
           </Stack>
         </Box>
         {Tab === 1 && <WinOneMin gid="1" />}
-        {Tab === 2 && <WinOneMin gid="2" />}
-        {Tab === 3 && <WinOneMin gid="3" />}
+        {Tab === 2 && <WinThreeMin gid="2" />}
+        {Tab === 3 && <WinFiveMin gid="3" />}
+          {/* opendialogbox */}
         {opendialogbox && (
           <Dialog
             open={opendialogbox}
@@ -191,7 +198,7 @@ function Win() {
               },
             }}
           >
-            <WinLossPopup />
+            <WinLossPopup gid={isAppliedbet?.split("_")?.[0]}/>
           </Dialog>
         )}
         <CustomCircularProgress isLoading={isLoading} />

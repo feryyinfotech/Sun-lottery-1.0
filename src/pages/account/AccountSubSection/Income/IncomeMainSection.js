@@ -21,8 +21,8 @@ import Layout from "../../../../component/Layout/Layout";
 import { endpoint } from "../../../../services/urls";
 function IncomeMainSection() {
   const navigate = useNavigate();
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data).UserID;
+  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
+  const user_id =login_data &&  JSON.parse(login_data)?.UserID;
   const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
     refetchOnMount: false,
     refetchOnReconnect: true,

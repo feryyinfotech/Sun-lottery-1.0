@@ -23,10 +23,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { withdrawAmountSchemaValidaton } from "../../../Shared/Validation";
 import Layout from "../../../component/Layout/Layout";
-
+import CryptoJS from 'crypto-js'
 function AddBankDetails() {
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data)?.UserID;
+  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
+  const user_id = login_data &&  JSON.parse(login_data)?.UserID;
   const [amount, setAmount] = React.useState({ wallet: 0, winning: 0 });
 
   const navigate = useNavigate();

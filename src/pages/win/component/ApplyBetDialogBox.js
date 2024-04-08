@@ -18,11 +18,14 @@ import axios from "axios";
 import * as React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { endpoint } from "../../../services/urls";
 import Policy from "./policy/Policy";
-
+import { MyHistoryFn, get_user_data_fn } from "../../../services/apicalling";
+import { useDispatch, useSelector } from "react-redux";
+import { pendingIdsFunction } from "../../../redux/slices/counterSlice";
+import CryptoJS from "crypto-js";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -32,13 +35,30 @@ const ApplyBetDialogBox = ({
   type,
   gid,
 }) => {
+  const dispatch = useDispatch();
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
   const client = useQueryClient();
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data).UserID;
+  const login_data =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null;
+  // const login_data_ = localStorage.getItem("aviator_data");
+  const first_rechange =
+    aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
+  const user_id = login_data && JSON.parse(login_data)?.UserID;
   const [value, setValue] = useState(1);
   const [Rules, setRules] = useState(false);
   const [calculated_value, setcalculated_value] = useState(1);
   const [loding, setLoding] = useState(false);
+
+  React.useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
 
   const handleClickValue = (value) => {
     if (value === 0) {
@@ -59,7 +79,7 @@ const ApplyBetDialogBox = ({
     console.log("FUnction called apply bit");
     const reqBody = {
       userid: user_id,
-      amount: calculated_value | 0,
+      amount: value | 0,
       number:
         (type === "green" && 10) ||
         (type === "red" && 30) ||
@@ -71,7 +91,6 @@ const ApplyBetDialogBox = ({
     };
     try {
       const response = await axios.post(`${endpoint.applybet}`, reqBody);
-      console.log(response);
       if (response?.data?.error === "200") {
         toast.success(response?.data?.msg);
         setapply_bit_dialog_box(false);
@@ -204,7 +223,10 @@ const ApplyBetDialogBox = ({
         {[1, 5, 10, 20, 50, 100]?.map((i) => {
           return (
             <div
-              onClick={() => setcalculated_value(value * i)}
+              onClick={() =>{ 
+                handleClickValue(value*i)
+                // setcalculated_value(value)
+                }}
               className={`${
                 ((type === "green" ||
                   type === 1 ||
@@ -236,7 +258,7 @@ const ApplyBetDialogBox = ({
           Total contract money is ₹{" "}
         </Typography>
         <Typography variant="body1" color="initial">
-          {calculated_value || "0"}
+          {value || "0"}
         </Typography>
       </Stack>
       <Stack direction="row" className="agree-btn">
@@ -264,7 +286,11 @@ const ApplyBetDialogBox = ({
           className="!text-white"
           variant="text"
           color="primary"
-          onClick={() => betFunctionStart()}
+          onClick={() => {
+            Number(first_rechange) === 1
+              ? betFunctionStart()
+              : toast("You must be sure that , your first deposit is done.");
+          }}
           loding={true}
         >
           Confirm

@@ -1,8 +1,11 @@
 import axios from "axios";
 import { endpoint } from "../urls";
 import toast from "react-hot-toast";
-const login_data = localStorage.getItem("logindata");
-const user_id = login_data && JSON.parse(login_data)?.UserID;
+import { aviator_login_data_fn } from "../../redux/slices/counterSlice";
+import CryptoJS from 'crypto-js'
+const value = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null;
+const user_id = value && JSON.parse(value)?.UserID;
+
 export const MyProfileDataFn = async () => {
   try {
     const response = await axios.get(`${endpoint.profiledata}?id=${user_id}`);
@@ -21,7 +24,7 @@ export const MypromotionDataFn = async () => {
     console.log(e);
   }
 };
-export const get_user_data_fn = async () => {
+export const get_user_data_fn = async (dispatch) => {
   try {
     const response = await axios.get(
       `${endpoint.get_data_by_user_id}?id=${user_id}`,
@@ -34,10 +37,11 @@ export const get_user_data_fn = async () => {
     );
     console.log(response, "This is response");
     if (response?.data?.error === "200") {
-      localStorage.setItem(
-        "aviator_data",
-        JSON.stringify(response?.data?.data)
-      );
+      dispatch(aviator_login_data_fn(JSON.stringify(response?.data?.data)))
+      // localStorage.setItem(
+      //   "aviator_data",
+      //   JSON.stringify(response?.data?.data)
+      // );
     }
     sessionStorage.setItem("isAvailableUser", true);
   } catch (e) {
@@ -56,10 +60,10 @@ export const CandidateNameFn = async (reqbody) => {
     console.log(e);
   }
 };
-export const MyHistoryFn = async () => {
+export const MyHistoryFn = async (gid) => {
   try {
     const response = await axios.get(
-      `${endpoint.my_history}?userid=${user_id}&limit=0`
+      `${endpoint.my_history}?userid=${user_id}&limit=0&gameid=${gid}`
     );
     return response;
   } catch (e) {
@@ -67,6 +71,19 @@ export const MyHistoryFn = async () => {
     console.log(e);
   }
 };
+
+export const My_All_HistoryFn = async (gid) => {
+  try {
+    const response = await axios.get(
+      `${endpoint.my_history_all}?userid=${user_id}&limit=0&gameid=${gid}`
+    );
+    return response;
+  } catch (e) {
+    toast(e?.message);
+    console.log(e);
+  }
+};
+
 export const cashDepositFn = async(reqbody)=>{
   try{
       const res = axios.get(`${endpoint.cash_deposit}`,{
@@ -95,6 +112,29 @@ export const walletamount = async () => {
   try {
     const response = await axios.get(
       `${endpoint.userwallet}?userid=${user_id}`
+    );
+    return response;
+  } catch (e) {
+    toast(e?.message);
+    console.log(e);
+  }
+};
+export const allWithdrawlCashUserFn = async () => {
+  try {
+    const response = await axios.get(
+      `${endpoint.all_withdrawl_user_list}`
+    );
+    return response;
+  } catch (e) {
+    toast(e?.message);
+    console.log(e);
+  }
+};
+
+export const top11WinnerFunction = async () => {
+  try {
+    const response = await axios.get(
+      `${endpoint.top11winner}`
     );
     return response;
   } catch (e) {

@@ -6,6 +6,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Container,
   Dialog,
   DialogContent,
@@ -14,13 +15,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import copy from "clipboard-copy";
+import CryptoJS from "crypto-js";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { RxCross2 } from "react-icons/rx";
 import { useQuery } from "react-query";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -39,16 +42,8 @@ import megaphone from "../../assets/images/megaphone.png";
 import position2 from "../../assets/images/positio2.png";
 import position3 from "../../assets/images/position3.png";
 import position1 from "../../assets/images/positoin1.png";
-import pro1 from "../../assets/images/pr1.jpg";
-import pro2 from "../../assets/images/pr2.jpg";
-import pro3 from "../../assets/images/pr3.jpg";
 import stage from "../../assets/images/stage-podium1.jpeg";
-import winp1 from "../../assets/images/winp1.jpg";
-import winp2 from "../../assets/images/winp2.jpg";
-import winp3 from "../../assets/images/winp3.jpg";
 import winp4 from "../../assets/images/winp4.jpg";
-import winp5 from "../../assets/images/winp5.jpg";
-import winp6 from "../../assets/images/winp6.jpg";
 import sajid from "../../assets/sajid.PNG";
 import tanveer from "../../assets/tanveer.PNG";
 import Layout from "../../component/Layout/Layout";
@@ -58,10 +53,17 @@ import {
 } from "../../redux/slices/counterSlice";
 import {
   MyProfileDataFn,
+  allWithdrawlCashUserFn,
   get_user_data_fn,
   walletamount,
 } from "../../services/apicalling";
-import { fron_end_main_domain, support_mail, telegram_url } from "../../services/urls";
+import {
+  endpoint,
+  fron_end_main_domain,
+  rupees,
+  support_mail,
+  telegram_url,
+} from "../../services/urls";
 import Lottery from "./DashboadSubcomponent/Lottery";
 import Original from "./DashboadSubcomponent/Original";
 import Sports from "./DashboadSubcomponent/Sports";
@@ -72,15 +74,29 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 function Dashboard() {
   const dispatch = useDispatch();
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+
   const isAvailableUser = sessionStorage.getItem("isAvailableUser");
-  const aviator_data = localStorage.getItem("aviator_data");
+  // const aviator_data = localStorage.getItem("aviator_data");
+  const value =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null;
+  //  console.log(JSON.parse(value));
   const navigate = useNavigate();
-  const [data_array, setdata_array] = React.useState([1, 2, 3, 4]);
   const [poicy, setpoicy] = React.useState(false);
   const [type_of_game, settype_of_game] = React.useState("");
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data).UserID;
-  const [referal_code, setReferral_code] = useState("");
+  // const login_data = localStorage.getItem("logindata");
+  const user_id = value && JSON.parse(value).UserID;
+  const [winnner_data, setwinnerdata] = useState([]);
+  const [openbannerurl, setopenbannerurl] = useState("");
+  const [loding, setloding] = useState(false);
+  const [lodingBanner, setlodingBanner] = useState(false);
 
   useEffect(() => {
     if (!checkTokenValidity()) {
@@ -94,12 +110,39 @@ function Dashboard() {
     copy(value);
     toast.success("Copied to clipboard!");
   };
+
+  const top11WinnerFunction = async () => {
+    setloding(true);
+    try {
+      const response = await axios.get(`${endpoint.top11winner}`);
+      setwinnerdata(response?.data?.data);
+    } catch (e) {
+      toast(e?.message);
+      console.log(e);
+    }
+    setloding(false);
+  };
+
+  useEffect(() => {
+    top11WinnerFunction();
+  }, []);
+
   const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
     refetchOnMount: false,
     refetchOnReconnect: true,
   });
 
   const newdata = data?.data?.data || 0;
+
+  const {
+    isLoading: allWithdrawlCashUserFnLoding,
+    data: allWithdrawlCashData,
+  } = useQuery(["allWithdrawlCashUser"], () => allWithdrawlCashUserFn(), {
+    refetchOnMount: false,
+    refetchOnReconnect: true,
+  });
+
+  const allWithdrawl_CashData = allWithdrawlCashData?.data?.data || [];
 
   const { isLoading: profile_loding, data: profile } = useQuery(
     ["myprofile"],
@@ -110,7 +153,28 @@ function Dashboard() {
     }
   );
 
-  const result = profile?.data?.data;
+  const result = profile?.data?.data || [];
+
+  useEffect(() => {
+    openbannerFunction();
+    localStorage.removeItem("amount_set");
+    localStorage.removeItem("Deposit_type");
+    localStorage.removeItem("server_provider");
+  }, []);
+
+  const openbannerFunction = async () => {
+    setlodingBanner(true);
+    try {
+      const response = await axios.get(`${endpoint.openbannerUrl}`);
+      setopenbannerurl(response?.data?.image);
+    } catch (e) {
+      toast(e?.message);
+      console.log(e);
+    }
+    setlodingBanner(false);
+  };
+
+  // console.log(openbannerurl);
 
   // useEffect(() => {
   //   console.log(result?.referral_code, "nandn");
@@ -152,14 +216,14 @@ function Dashboard() {
     dispatch(please_reconnect_the_serverFun(false));
   }, []);
 
-  useEffect(() => {
-    setInterval(() => {
-      setdata_array([...data_array, 100]);
-      setTimeout(() => {
-        setdata_array(data_array.slice(0, data_array.length));
-      }, 1000);
-    }, 3000);
-  }, []);
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     setdata_array([...data_array, 100]);
+  //     setTimeout(() => {
+  //       setdata_array(data_array.slice(0, data_array.length));
+  //     }, 1000);
+  //   }, 3000);
+  // }, []);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -169,8 +233,8 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    !aviator_data && get_user_data_fn();
-  }, [aviator_data]);
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
 
   const game_data = [
     {
@@ -264,6 +328,50 @@ function Dashboard() {
               </SwiperSlide>
             </Swiper>
           </Box>
+          <Box className="!px-2">
+            <Swiper
+              spaceBetween={30}
+              centeredSlides={true}
+              autoplay={{ delay: 2000, disableOnInteraction: false }}
+              pagination={{ clickable: true }}
+              navigation={false}
+              modules={[Autoplay, Pagination, Navigation]}
+              className="mySwiper !rounded-lg !mt-2"
+            >
+              {allWithdrawlCashUserFnLoding
+                ? [1, 2]?.map((i) => {
+                    return (
+                      <SwiperSlide>
+                        <CircularProgress className="!text-white" />
+                      </SwiperSlide>
+                    );
+                  })
+                : allWithdrawl_CashData?.map((i, index) => {
+                    return (
+                      <SwiperSlide key={index}>
+                        <div className="!h-20 !w-full  !flex !items-center ">
+                          <div className="!w-full grid grid-cols-2 place-items-center !bg-gradient-to-l from-[#0F0232] via-[#4939C1]  to-[#0F0232] !py-6">
+                            <div className="flex items-center justify-between gap-3">
+                              <Avatar alt="Remy Sharp" sizes="large">
+                                {i?.full_name?.substring(0, 1) || ""}
+                              </Avatar>
+                              <p className=" !text-white !text-lg !whitespace-nowrap">
+                                {i?.full_name || ""}
+                              </p>
+                            </div>
+                            <p className=" !text-white">
+                              Withdraw {rupees}{" "}
+                              <spna className={"!font-bold !text-[#FB8356]"}>
+                                {Number(i?.amount || 0).toFixed(2)}
+                              </spna>
+                            </p>
+                          </div>
+                        </div>
+                      </SwiperSlide>
+                    );
+                  })}
+            </Swiper>
+          </Box>
           <Box
             sx={{
               display: "flex",
@@ -283,7 +391,11 @@ function Dashboard() {
             <Box
               sx={{ width: "90%", "&>p": { fontSize: "13px", color: "white" } }}
             >
-              <Typography variant="body1" color="initial">
+              <Typography
+                variant="body1"
+                color="initial"
+                className="!text-[#FB8356]"
+              >
                 See the Installation page for additional docs about how to make
                 sure everything is set up correctly.
               </Typography>
@@ -304,7 +416,7 @@ function Dashboard() {
                   src={deposit}
                   alt="Deposit"
                   sx={styles.depositWithdrawIcon}
-                  // onClick={() => navigate("/wallet/Recharge")}
+                  onClick={() => navigate("/wallet/Recharge")}
                 />
               </Box>
               <Typography
@@ -336,7 +448,7 @@ function Dashboard() {
             >
               <Box className="serv-item">
                 <Box
-                  // onClick={() => navigate("/Withdrawal")}
+                  onClick={() => navigate("/Withdrawal")}
                   component="img"
                   src={cash}
                   alt="Withdraw"
@@ -447,122 +559,73 @@ function Dashboard() {
               {type_of_game === "Sports" && <Sports />}
             </div>
           </Box>
-          <Box sx={styles.wininfoouter}>
-            <Typography
-              variant="body1"
-              color="initial"
-              sx={{
-                color: "white",
-                fontWeight: "600",
-                fontSize: "16px",
-                mb: 2,
-              }}
-            >
-              Winning information
-            </Typography>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro1} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp4}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro2} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp5}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro1} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp1}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro2} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp2}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro3} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp3}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "0px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro3} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp6}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-          </Box>
+          {loding ? (
+            <div className="w-[100%] flex justify-center">
+              <CircularProgress className="!text-white" />
+            </div>
+          ) : (
+            <Box sx={styles.wininfoouter}>
+              <Typography
+                variant="body1"
+                color="initial"
+                sx={{
+                  color: "white",
+                  fontWeight: "600",
+                  fontSize: "16px",
+                  mb: 2,
+                }}
+              >
+                Winning information
+              </Typography>
+              {winnner_data.slice(3, 10)?.map((i, index) => {
+                return (
+                  <Stack
+                    key={index}
+                    direction="row"
+                    sx={{ ...styles.wininfoinner, mb: "10px" }}
+                  >
+                    <Stack direction="row" sx={styles.wininfoouterone}>
+                      <Avatar
+                        width={50}
+                        src={
+                          Math.floor(Math.random() * 5) + 1 === 1
+                            ? "https://mui.com/static/images/avatar/4.jpg"
+                            : Math.floor(Math.random() * 5) + 1 === 2
+                            ? "https://lh3.googleusercontent.com/a/ACg8ocJ_lQQ7XjcLthKctAe1u5A6Fv8JJUQ0ugECmc7RkiZmKfI=s360-c-no"
+                            : Math.floor(Math.random() * 5) + 1 === 3
+                            ? "https://sunlottery.fun/static/media/tanveer.03fd8989206194114777.PNG"
+                            : Math.floor(Math.random() * 5) + 1 === 4
+                            ? "https://sunlottery.fun/static/media/sajid.e6abfd6b30c0fa7d3b1a.PNG"
+                            : ""
+                        } // Close the src attribute here
+                        className={`capitalize ${
+                          i.id % 2 === 0 ? "!bg-[#2350BF]" : "!bg-green-700"
+                        }`}
+                      >
+                        {i?.email?.split("@")[0]?.substring(0, 1)}
+                      </Avatar>
+                      <Typography variant="body1">
+                        {i?.email?.split("@")[0]?.substring(0, 3) +
+                          "**" +
+                          i?.email?.split("@")[0]?.substring(3, 5)}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" sx={styles.wininfooutertwo}>
+                      <Box component="img" src={winp4} />
+                      <Box>
+                        <Typography variant="body1" color="initial">
+                          Receive ₹{Number(i?.win || 0)?.toFixed(2)}
+                        </Typography>
+                        <Typography variant="body1" color="initial">
+                          Winning amount
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Stack>
+                );
+              })}
+            </Box>
+          )}
 
           {/* stage Podium */}
           <Box
@@ -639,60 +702,107 @@ function Dashboard() {
             </Box>
           </Box>
           {/* stage Podium end */}
-          <Box sx={{ ...styles.wininfoouter, mb: "40px" }}>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro1} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp4}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "10px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro2} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp5}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-            <Stack direction="row" sx={{ ...styles.wininfoinner, mb: "0px" }}>
-              <Stack direction="row" sx={styles.wininfoouterone}>
-                <Avatar alt="Cindy Baker" src={pro3} width={50} />
-                <Typography variant="body1">Myh***pol</Typography>
-              </Stack>
-              <Stack direction="row" sx={styles.wininfooutertwo}>
-                <Box component="img" src={winp6}></Box>
-                <Box>
-                  <Typography variant="body1" color="initial">
-                    Receive ₹1,960.00
-                  </Typography>
-                  <Typography variant="body1" color="initial">
-                    Winning amount
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-          </Box>
-          {poicy && (
+          {loding ? (
+            <div className="w-[100%] flex justify-center">
+              {" "}
+              <CircularProgress className="!text-white" />
+            </div>
+          ) : (
+            <Box sx={{ ...styles.wininfoouter, mb: "40px" }}>
+              {winnner_data.slice(0, 3)?.map((i, index) => {
+                return (
+                  <Stack
+                    key={index}
+                    direction="row"
+                    sx={{ ...styles.wininfoinner, mb: "10px" }}
+                  >
+                    <Stack direction="row" sx={styles.wininfoouterone}>
+                      <Avatar
+                        width={50}
+                        src={
+                          Math.floor(Math.random() * 5) + 1 === 1
+                            ? "https://mui.com/static/images/avatar/4.jpg"
+                            : Math.floor(Math.random() * 5) + 1 === 2
+                            ? "https://lh3.googleusercontent.com/a/ACg8ocJ_lQQ7XjcLthKctAe1u5A6Fv8JJUQ0ugECmc7RkiZmKfI=s360-c-no"
+                            : Math.floor(Math.random() * 5) + 1 === 3
+                            ? "https://sunlottery.fun/static/media/tanveer.03fd8989206194114777.PNG"
+                            : Math.floor(Math.random() * 5) + 1 === 4
+                            ? "https://sunlottery.fun/static/media/sajid.e6abfd6b30c0fa7d3b1a.PNG"
+                            : Math.floor(Math.random() * 5) + 1 === 5
+                            ? "https://res.cloudinary.com/do7kimovl/image/upload/v1711806164/WhatsApp_Image_2024-03-30_at_6.53.33_PM_qo99n4.jpg"
+                            : ""
+                        } // Close the src attribute here
+                        className={`capitalize ${
+                          i.id % 2 === 0 ? "!bg-[#2350BF]" : "!bg-green-700"
+                        }`}
+                      >
+                        {i?.email?.split("@")[0]?.substring(0, 1)}
+                      </Avatar>
+                      <Typography variant="body1">
+                        {i?.email?.split("@")[0]?.substring(0, 3) +
+                          "**" +
+                          i?.email?.split("@")[0]?.substring(3, 4)}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" sx={styles.wininfooutertwo}>
+                      <Box component="img" src={winp4} />
+                      <Box>
+                        <Typography variant="body1" color="initial">
+                          Receive ₹{Number(i?.win || 0)?.toFixed(2)}
+                        </Typography>
+                        <Typography variant="body1" color="initial">
+                          Winning amount
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Stack>
+                );
+              })}
+            </Box>
+          )}
+          {/*  */}
+          {poicy && !lodingBanner && (
+            <Dialog
+              open={poicy}
+              TransitionComponent={Transition}
+              keepMounted
+              onClose={handleClosepolicy}
+              aria-describedby="alert-dialog-slide-description"
+              PaperProps={{ className: `!max-w-[500px] ${gray}` }}
+            >
+              <div
+                style={{
+                  background: zubgmid,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "15px",
+                }}
+              >
+                {openbannerurl === "https://admin.sunlottery.fun" ||
+                  (openbannerurl === "" && (
+                    <p style={{ color: "white", fontSize: "14px" }}>
+                      Notification
+                    </p>
+                  ))}{" "}
+                <RxCross2
+                  style={{ color: "white" }}
+                  onClick={handleClosepolicy}
+                />
+              </div>
+              <DialogContent style={{ background: zubgback }}>
+                {/*  */}
+                {openbannerurl === "https://admin.sunlottery.fun" ||
+                openbannerurl === "" ? (
+                  <Notification handleClosepolicy={handleClosepolicy} />
+                ) : (
+                  <img src={openbannerurl} className="w-[100%] h-[100%]" />
+                )}
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {/* {poicy && (
             <Dialog
               open={poicy}
               TransitionComponent={Transition}
@@ -720,10 +830,10 @@ function Dashboard() {
                 <Notification handleClosepolicy={handleClosepolicy} />
               </DialogContent>
             </Dialog>
-          )}
+          )} */}
         </Container>
       </Box>
-      <CustomCircularProgress isLoading={isLoading} />
+      <CustomCircularProgress isLoading={isLoading || profile_loding} />
     </Layout>
   );
 }

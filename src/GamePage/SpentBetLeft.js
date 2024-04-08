@@ -15,17 +15,25 @@ import { useQueryClient } from "react-query";
 import { gray } from "./color";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { endpoint, rupees } from "../services/urls";
+import { useDispatch, useSelector } from "react-redux";
+import { get_user_data_fn } from "../services/apicalling";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
+  const dispatch = useDispatch();
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+
   const client = useQueryClient();
   const spent_amount1 = localStorage.getItem("spent_amount1");
-  const pre_amount =
-    client.getQueriesData("walletamount_aviator")?.[0]?.[1]?.data?.wallet || 0;
+  const amount_total =
+    client.getQueriesData("walletamount_aviator")?.[0]?.[1]?.data?.data || 0;
+  const pre_amount = Number(
+    Number(amount_total?.wallet || 0) + Number(amount_total?.winning || 0)
+  ).toFixed(2);
+
   const [loding, setloding] = useState(false);
-  const logindata = localStorage.getItem("aviator_data");
+  // const logindata = localStorage.getItem("aviator_data");
   const [selectedValue, setSelectedValue] = useState("Bet");
   const [betValue, setBetValue] = useState(10);
   // const [openCustomDialogBox, setOpenCustomDialogBox] = useState(false);
@@ -42,10 +50,14 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
     },
   });
 
+  useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
+
   const spentBit = async () => {
     setloding(true);
     const reqbody = {
-      userid: JSON.parse(logindata)?.id || 2,
+      userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
       amount: betValue || 0,
     };
     try {
@@ -57,7 +69,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
         client.refetchQueries("historydata");
         client.refetchQueries("walletamount_aviator");
         // startFly("left");
-        
+
         fk.setFieldValue("isStart1", true);
         getHistory();
       }
@@ -77,15 +89,16 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   };
 
   useEffect(() => {
-    if(fk.values.isFlying && leftbitfk?.values?.isbetActive) {
+    if (fk.values.isFlying && leftbitfk?.values?.isbetActive) {
       spentBit();
-    }else{
-     !leftbitfk?.values?.isbetActive && fk.setFieldValue("isStart1",false)
+    } else {
+      !leftbitfk?.values?.isbetActive && fk.setFieldValue("isStart1", false);
     }
   }, [fk.values.isFlying]);
 
   const getHistory = async () => {
-    const userid = JSON.parse(logindata)?.id || 2;
+    const userid =
+      (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2;
 
     try {
       const response = await axios.get(
@@ -100,7 +113,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
 
   const cashOut = async (sec, mili) => {
     const reqbody = {
-      userid: JSON.parse(logindata)?.id || 2,
+      userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
       amount: betValue || 0,
       gameno: gameno,
       multiplier: Number(`${sec}.${mili}`),
@@ -172,6 +185,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
     client.refetchQueries("walletamount_aviator");
     localStorage.removeItem("spent_amount1");
   };
+
   useEffect(() => {
     if (
       fk.values.isStart1 &&
@@ -284,9 +298,11 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
                   return;
                 }
                 // cash out
-                if (fk.values.isStart1 && fk.values.isFlying ) {
+                if (fk.values.isStart1 && fk.values.isFlying) {
                   fk.setFieldValue("isStart1", false);
-                  if (pre_amount) cashOut(seconds, milliseconds);
+                  if (pre_amount) {
+                    cashOut(seconds, milliseconds);
+                  }
                 }
                 // spent bet
                 else {
@@ -326,7 +342,10 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
                       fk.values.isStart1 && !fk.values.isFlying && "py-4"
                     }`}
                   >
-                    {fk.values.isStart1 && fk.values.isFlying && pre_amount  && spent_amount1
+                    {fk.values.isStart1 &&
+                    fk.values.isFlying &&
+                    pre_amount &&
+                    spent_amount1
                       ? "Cash Out"
                       : fk.values.isStart1 && !fk.values.isFlying
                       ? "Cancel"
@@ -338,7 +357,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
                   >
                     {fk.values.isStart1 && !fk.values.isFlying
                       ? ""
-                      : fk.values.isStart1 
+                      : fk.values.isStart1
                       ? `${
                           betValue * seconds +
                             Number(milliseconds?.toString()?.substring(0, 1)) ||
@@ -410,7 +429,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
 export default SpentBetLeft;
 
 // {openCustomDialogBox && (
-//   <Dialog   
+//   <Dialog
 //     open={openCustomDialogBox}
 //     TransitionComponent={Transition}
 //     keepMounted

@@ -1,6 +1,9 @@
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import { Box, Container, Stack, Typography } from "@mui/material";
 import * as React from "react";
+import ReactApexChart from "react-apexcharts";
+import { useQuery } from "react-query";
+import { useMediaQuery } from "react-responsive";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad, zubgmid } from "../../Shared/color";
@@ -10,11 +13,7 @@ import wdhistory from "../../assets/images/history.png";
 import deposite from "../../assets/images/payment.png";
 import wallet from "../../assets/images/wallet.png";
 import Layout from "../../component/Layout/Layout";
-import { useQuery } from "react-query";
 import { MyProfileDataFn } from "../../services/apicalling";
-import ReactApexChart from "react-apexcharts";
-import { rupees } from "../../services/urls";
-import { useMediaQuery } from "react-responsive";
 
 function Wallet() {
   const isMediumScreen = useMediaQuery({ minWidth: 800 });
@@ -34,7 +33,7 @@ function Wallet() {
         height: 350,
         type: "radialBar",
         toolbar: {
-          show: true,
+          show: false,
         },
       },
       plotOptions: {
@@ -109,13 +108,17 @@ function Wallet() {
     },
   };
   const third_party_wallet = {
-    series: [75],
+    series: [(
+      Number(
+        Number(result?.winning_wallet || 0) 
+      ) || 0
+    )?.toFixed(0)],
     options: {
       chart: {
         height: 350,
         type: "radialBar",
         toolbar: {
-          show: true,
+          show: false,
         },
       },
       plotOptions: {
@@ -279,15 +282,11 @@ function Wallet() {
               >
                 <Typography variant="body1" color="initial">
                   ₹{" "}
-                  {(
-                    Number(
-                      Number(result?.winning_wallet || 0) +
-                      Number(result?.wallet || 0)
-                    ) || 0
-                  )?.toFixed(0)}
+                 
+                  {Number(result?.bonus || 0)}
                 </Typography>
                 <Typography variant="body1" color="initial">
-                  Main Wallet
+                  Bonus Amount
                 </Typography>
               </Box>
             </Box>
@@ -305,10 +304,13 @@ function Wallet() {
                 }}
               >
                 <Typography variant="body1" color="initial">
-                  ₹ 3,077.72
+                  ₹  {(
+                    Number(
+                      Number(result?.winning_wallet || 0)) || 0
+                  )?.toFixed(0)}
                 </Typography>
                 <Typography variant="body1" color="initial">
-                  3rd party wallets
+                  Winning Amount
                 </Typography>
               </Box>
             </Box>

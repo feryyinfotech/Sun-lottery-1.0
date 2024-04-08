@@ -10,15 +10,30 @@ import logo from "../../../assets/images/logo.png";
 import poster from "../../../assets/images/poster2.jpg";
 import LoginWithEmail from "./LoginWithEmail";
 import LoginWithMobile from "./LoginWithMobile";
-
+import { get_user_data_fn } from "../../../services/apicalling";
+import CryptoJS from 'crypto-js'
+import { useDispatch,useSelector } from "react-redux";
 function Login() {
   const navigate = useNavigate()
   const [Nav, setNav] = useState(1);
-  const logindata = localStorage.getItem("logindata")
-  const aviator_data = localStorage.getItem("aviator_data")
+
+  const dispatch = useDispatch()
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+
+
+  const logindata = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
+  // const aviator_data = localStorage.getItem("aviator_data")
+
+  
+  // useEffect(() => {
+  //   !aviator_login_data && get_user_data_fn(dispatch);
+  // }, []);
+
 
   useEffect(()=>{
-    (logindata && aviator_data) && navigate('/dashboard')
+    (logindata) && navigate('/dashboard')
   },[])
   
   return (

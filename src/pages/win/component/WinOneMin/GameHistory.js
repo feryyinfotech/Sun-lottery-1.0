@@ -1,27 +1,28 @@
 
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
-import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import axios from "axios";
 import * as React from "react";
 import toast from "react-hot-toast";
 import { useQuery } from "react-query";
-import { endpoint } from "../../../../services/urls";
-import history from '../../../../assets/images/rules.png'
-import { zubgback, zubgbackgrad, zubgmid } from "../../../../Shared/color";
 import CustomCircularProgress from "../../../../Shared/CustomCircularProgress";
+import { zubgback, zubgbackgrad } from "../../../../Shared/color";
+import history from '../../../../assets/images/rules.png';
+import { endpoint } from "../../../../services/urls";
+import { useDispatch } from "react-redux";
+import { updateNextCounter } from "../../../../redux/slices/counterSlice";
 
 const GameHistory = ({ gid }) => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [page, setPage] = React.useState(0);
-  
+   const dispatch = useDispatch()
   const { isLoading, data: game_history } = useQuery(
     ["gamehistory", gid],
     () => GameHistoryFn(gid),
@@ -44,6 +45,10 @@ const GameHistory = ({ gid }) => {
   };
 
   const game_history_data = game_history?.data?.data;
+  React.useEffect(()=>{
+    dispatch(updateNextCounter( game_history?.data?.data ?  Number(game_history?.data?.data?.[0]?.gamesno)+1 : 1))
+  },[game_history?.data?.data])
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -80,8 +85,8 @@ const GameHistory = ({ gid }) => {
               : "Five Go Record"}
         </Typography>
       </Stack>
-      <TableContainer component={Paper}>
-        <Table sx={{ maxWidth: 575, background: zubgback, color: "white" }} className="wintable" aria-label="simple table">
+      <TableContainer>
+        <Table sx={{ background: zubgback, color: "white" }} className="wintable" aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell className="!text-sm">Period</TableCell>
@@ -98,7 +103,7 @@ const GameHistory = ({ gid }) => {
                     <span
                       className={`
                  !bg-gradient-to-t from-[#FE63FF] to-[#007AFF]
-                  transparentColor font-bold text-lg
+                  transparentColor font-bold 
                   `}
                     >
                       {i?.gamesno}
@@ -221,7 +226,7 @@ const GameHistory = ({ gid }) => {
           />
         </Box>
       </TableContainer>
-      <CustomCircularProgress isLoading={isLoading}/>
+      {/* <CustomCircularProgress isLoading={isLoading}/> */}
     </Box>
   );
 };

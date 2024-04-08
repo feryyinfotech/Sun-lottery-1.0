@@ -175,7 +175,7 @@ function PromotionRule() {
           <Box sx={style.box}>
             <Box sx={style.boxNumber}>08</Box>
             <Typography variant="body1" color="initial">
-              The final interpretation of this activity belongs to Welcome to BDG Game
+              The final interpretation of this activity belongs to Welcome to Sun Lottery Game
             </Typography>
           </Box>
         </Box>

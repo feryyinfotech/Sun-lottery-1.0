@@ -17,15 +17,15 @@ import { endpoint } from '../../services/urls';
 import TrxWin1Min from './Component/TrxWin1Min';
 import TrxWin3Min from './Component/TrxWin3Min';
 import TrxWin5Min from './Component/TrxWin5Min';
-
+import CryptoJS from 'crypto-js'
 
 
 function Trx() {
 
   const [Tab, setTab] = useState(1);
   const navigate = useNavigate()
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data).UserID;
+  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
+  const user_id =login_data && JSON.parse(login_data)?.UserID;
   const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
     refetchOnMount: false,
     refetchOnReconnect: true,

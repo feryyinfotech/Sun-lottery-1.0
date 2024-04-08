@@ -53,6 +53,7 @@ import TeamRewardBonus from "../pages/income/incomeSubSection/TeamRewardBonus";
 import AddBankDetails from "../pages/account/Component/AddBankDetails";
 import AddedBankDetailList from "../pages/account/Component/AddedBankDetailList";
 import QRScreen from "../pages/wallet/component/QRScreen";
+import TeamData from "../pages/promotion/component/TeamData";
 
 export const routes = [
     {
@@ -166,6 +167,10 @@ export const routes = [
     {
         path: "/promotion/TeamReport/",
         component: <TeamReports />
+    },
+    {
+        path: "/promotion/TeamReport/data",
+        component: <TeamData />
     },
     {
         path: "/promotion/MyCommission/",

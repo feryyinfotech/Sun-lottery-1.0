@@ -234,6 +234,20 @@ function Promotion() {
                 </Stack>
               </Box>
             </NavLink>
+            <NavLink to="/promotion/TeamReport/data">
+              <Box sx={style.invitbox}>
+                <Stack direction="row">
+                  {/* <Box component='img' src={team_port}></Box> */}
+                  <Box component="img" src={donut}></Box>
+                  <Typography variant="body1" color="initial">
+                    Team data
+                  </Typography>
+                </Stack>
+                <Stack direction="row">
+                  <ArrowForwardIosOutlinedIcon />
+                </Stack>
+              </Box>
+            </NavLink>
             <NavLink to="/promotion/MyCommission">
               <Box sx={style.invitbox}>
                 <Stack direction="row">
@@ -275,10 +289,9 @@ function Promotion() {
                 </Stack>
               </Box>
             </NavLink>
-            <NavLink to="/promotion/RebateRatio/">
+            {/* <NavLink to="/promotion/RebateRatio/">
               <Box sx={style.invitbox}>
                 <Stack direction="row">
-                  {/* <Box component='img' src={rebateRatio}></Box> */}
                   <Box component="img" src={money}></Box>
                   <Typography variant="body1" color="initial">
                     Rebate ratio
@@ -288,7 +301,7 @@ function Promotion() {
                   <ArrowForwardIosOutlinedIcon />
                 </Stack>
               </Box>
-            </NavLink>
+            </NavLink> */}
             <Box sx={style.promotionBoxOuter}>
               <Box sx={style.promotionBox}>
                 <Stack direction="row">

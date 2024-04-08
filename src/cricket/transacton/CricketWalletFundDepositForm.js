@@ -43,6 +43,9 @@ function CricketWalletFundDepositForm() {
         fk.values.service_provider === "Select Service Provider"
       ) return toast("Please Choose all Fields")
       localStorage.setItem("amount_set", fk.values.amount);
+      localStorage.setItem("Deposit_type", fk.values.deposit_type);
+      localStorage.setItem("server_provider", fk.values.service_provider);
+      
       navigate("/wallet/Recharge");
     },
   });

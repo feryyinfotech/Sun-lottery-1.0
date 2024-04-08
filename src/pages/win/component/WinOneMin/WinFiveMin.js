@@ -22,7 +22,7 @@ import ThreeMinCountDown from "./ThreeMinCountDown";
 import TwoMinCountDown from "./TwoMinCountDown";
 import { useFormik } from "formik";
 
-function WinOneMin({ gid }) {
+function WinFiveMin({ gid }) {
   const [TabTwo, setTabTwo] = useState(1);
   const [apply_bit_dialog_box, setapply_bit_dialog_box] = React.useState(false);
   const [dialog_type, setdialog_type] = React.useState(0);
@@ -30,7 +30,7 @@ function WinOneMin({ gid }) {
 
   const initialValues = {
     openTimerDialogBoxOneMin: false,
-    show_this_one_min_time: 0,
+    show_this_one_min_time: "0_0",
   };
 
   const fk = useFormik({
@@ -43,7 +43,7 @@ function WinOneMin({ gid }) {
   return (
     <Box className="mainBox">
       {React.useMemo(() => {
-        return <OneMinCountDown fk={fk} />
+        return <ThreeMinCountDown fk={fk} />
       }, [])}
       {React.useMemo(() => {
         return (
@@ -78,8 +78,7 @@ function WinOneMin({ gid }) {
                     }}
                     className="!bg-white !bg-opacity-50 !text-[#1610D0]"
                   >
-                    {String(fk?.values?.show_this_one_min_time)
-                      ?.padStart(2, "0")
+                    {String(fk.values.show_this_one_min_time?.split("_")?.[1]).padStart(2, "0")
                       ?.substring(0, 1)}
                   </div>
                   <div
@@ -96,8 +95,7 @@ function WinOneMin({ gid }) {
                     }}
                     className="!bg-white !bg-opacity-50 !text-[#1610D0]"
                   >
-                    {String(fk?.values?.show_this_one_min_time)
-                      ?.padStart(2, "0")
+                    {String(fk.values.show_this_one_min_time?.split("_")?.[1]).padStart(2, "0")
                       ?.substring(1, 2)}
                   </div>
                 </div>
@@ -149,7 +147,7 @@ function WinOneMin({ gid }) {
                 justifyContent: "space-between",
                 mb: "20px",
 
-                "&>img": { width: "15%" },
+                "&>img": { width: "17%" },
               }}
             >
               {[
@@ -161,7 +159,7 @@ function WinOneMin({ gid }) {
               ]?.map((i) => {
                 return (
                   <img
-                    className="!cursor-pointer "
+                    className="!cursor-pointer"
                     src={i?.img}
                     onClick={() => {
                       setapply_bit_dialog_box(true);
@@ -179,7 +177,7 @@ function WinOneMin({ gid }) {
                 justifyContent: "space-between",
                 mb: "20px",
 
-                "&>img": { width: "15%" },
+                "&>img": { width: "17%" },
               }}
             >
               {[
@@ -291,4 +289,5 @@ function WinOneMin({ gid }) {
   );
 }
 
-export default WinOneMin;
+export default WinFiveMin;
+

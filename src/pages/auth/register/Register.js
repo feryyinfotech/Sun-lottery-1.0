@@ -28,7 +28,7 @@ import logo from "../../../assets/images/logo.png";
 import poster from "../../../assets/images/poster2.jpg";
 import { CandidateNameFn } from "../../../services/apicalling";
 import { endpoint } from "../../../services/urls";
-
+import CryptoJS from "crypto-js";
 function Register() {
   const url = new URL(window.location.href);
   const [refParam, setrefParam] = useState(url.searchParams.get("ref") || "");
@@ -108,7 +108,11 @@ function Register() {
       });
 
       if (response?.data?.status === "200") {
-        localStorage.setItem("logindata", JSON.stringify(response?.data));
+        const value = CryptoJS.AES.encrypt(
+          JSON.stringify(response?.data),
+          "anand"
+        )?.toString();
+        localStorage.setItem("logindataen", value);
         sessionStorage.setItem("isAvailableUser", true);
         sessionStorage.setItem("isAvailableCricketUser", true);
         navigate("/dashboard");

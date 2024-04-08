@@ -16,6 +16,7 @@ import wtd from "../../assets/images/cash-withdrawal.png";
 import casino from "../../assets/images/casino.png";
 import customer from "../../assets/images/customer-service.png";
 import dpt from "../../assets/images/deposit.png";
+import edit from "../../assets/images/edit_bank_details.png";
 import gift from "../../assets/images/gift-box.png";
 import graph from "../../assets/images/graph.png";
 import hand from "../../assets/images/hand.png";
@@ -25,11 +26,9 @@ import Rank from "../../assets/images/rank.png";
 import balance from "../../assets/images/send.png";
 import setting from "../../assets/images/settings (1).png";
 import trans from "../../assets/images/translation.png";
-import edit from "../../assets/images/edit_bank_details.png";
 import s from "../../assets/images/wallet.png";
 import Layout from "../../component/Layout/Layout";
 import { MyProfileDataFn } from "../../services/apicalling";
-import { Edit } from "@mui/icons-material";
 function Account() {
   const navigate = useNavigate();
   const profile_data = localStorage.getItem("profile_data");
@@ -114,7 +113,7 @@ function Account() {
           <Box
             sx={style.actionBox}
             component={NavLink}
-            // to="/wallet/Recharge"
+            to="/wallet/Recharge"
           >
             <Box component="img" src={dpt} sx={style.actionImage} />
             <Typography variant="body1" color="initial" sx={style.actionText}>
@@ -124,7 +123,7 @@ function Account() {
           <Box
             sx={style.actionBox}
             component={NavLink}
-            // to="/Withdrawal"
+            to="/Withdrawal"
           >
             <Box component="img" src={wtd} sx={style.actionImage} />
             <Typography variant="body1" color="initial" sx={style.actionText}>

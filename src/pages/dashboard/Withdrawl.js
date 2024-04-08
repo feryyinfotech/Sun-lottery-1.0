@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
   FormControl,
   MenuItem,
   Stack,
@@ -18,9 +19,7 @@ import toast from "react-hot-toast";
 import { useQuery } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
-import {
-  withdraw_amount_validation_schema
-} from "../../Shared/Validation";
+import { withdraw_amount_validation_schema } from "../../Shared/Validation";
 import { zubgback, zubgbackgrad, zubgmid } from "../../Shared/color";
 import cip from "../../assets/cip.png";
 import payment from "../../assets/images/payment (1).png";
@@ -28,15 +27,32 @@ import playgame from "../../assets/images/playgame.jpg";
 import balance from "../../assets/images/send.png";
 import audiovoice from "../../assets/images/withdrawol_voice.mp3";
 import Layout from "../../component/Layout/Layout";
-import { BankListDetails } from "../../services/apicalling";
+import { BankListDetails, get_user_data_fn } from "../../services/apicalling";
 import { endpoint } from "../../services/urls";
-
+import { useLocation } from "react-router-dom";
+import { useDispatch,useSelector } from "react-redux";
+import CryptoJS from 'crypto-js'
 function Withdrawl() {
-  const login_data = localStorage.getItem("logindata");
-  const user_id = JSON.parse(login_data)?.UserID;
-  const [amount, setAmount] = React.useState({ wallet: 0, winning: 0 });
+  const location = useLocation();
+  const dispatch = useDispatch()
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+  const { type } = location.state || {};
+  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null;
+  const first_rechange =aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
+
+  const user_id = login_data && JSON.parse(login_data)?.UserID;
+  const [amount, setAmount] = React.useState({ wallet: 0, winning: 0,cricket_wallet:0 });
   const [lodint, setloding] = React.useState(false);
   const audioRefMusic = React.useRef(null);
+  const [openDialogBox, setOpenDialogBox] = React.useState(false);
+  
+  
+  React.useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
+
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
@@ -89,27 +105,39 @@ function Withdrawl() {
     initialValues: initialValues,
     validationSchema: withdraw_amount_validation_schema,
     onSubmit: () => {
-      if (amount?.winning < fk.values.amount)
-        return toast("Your winning amount is low.");
+      if (type) {
+        if (Number(amount?.cricket_wallet || 0) < Number(fk.values.amount || 0))
+          return toast("Your Wallet Amount is low");
+      } else {
+        if (amount?.winning < fk.values.amount)
+          return toast("Your winning amount is low.");
+      }
       if (fk.values.bank_id === "Select Bank")
         return toast("Select Bank Account");
+      if (Number(fk.values.amount) < 110 && Number(fk.values.amount) > 50000)
+        return toast("Amount shoulb be minimum 110 and maximum 50,000");
+
       const data = result?.find((i) => i?.id === fk.values.bank_id);
       console.log(data, "This is bank data");
       if (!data) return toast("Data not found");
 
       const fd = new FormData();
-      fd.append("Amount", fk.values.amount);
-      fd.append("Email", data?.email);
-      fd.append("Mobile", data?.mobile);
-      fd.append("Description", fk.values.description);
-      fd.append("BankName", data?.bank_name);
-      fd.append("Name", data?.holder_name);
-      fd.append("Ifsc", data?.ifsc);
-      fd.append("Account", data?.account);
+
+      // fd.append("Name", data?.holder_name);
+      // 1 for wingo 2 for cricket
+      fd.append("type", type ? 2 : 1);
+      fd.append("Bankid", fk.values.bank_id);
       fd.append("TransactionID", `${Date.now()}${user_id}`);
+      fd.append("Description", fk.values.description);
+      fd.append("Amount", fk.values.amount);
+      fd.append("Mobile", data?.mobile);
       fd.append("user_id", user_id);
 
-      withdraw_payment_Function(fd);
+      // JSON.stringify(fk.values.bank_id)
+      Number(first_rechange) === 1
+        ? withdraw_payment_Function(fd)
+        : toast("You must be sure that , your first deposit is done.");
+
       // paymentRequest(fd, fk.values.amount);
       // fk.setFieldValue("all_data", {
       //   t_id: fd.get("TransactionID") || "",
@@ -124,8 +152,13 @@ function Withdrawl() {
     try {
       const response = await axios.post(`${endpoint.withdraw_payment}`, fd);
 
-      // setAmount(response?.data?.data);
-      console.log(response, "response");
+      if (response?.data?.msg === "Successfully Data Found") {
+        walletamountFn();
+        fk.handleReset();
+        setOpenDialogBox(true);
+      }else{
+        toast(response?.data?.msg)
+      }
     } catch (e) {
       toast(e?.message);
       console.log(e);
@@ -145,18 +178,14 @@ function Withdrawl() {
       console.error("Error during play:", error);
     }
   };
-  
-
 
   React.useEffect(() => {
     handlePlaySound();
   }, []);
 
-
-
   return (
     <Layout>
-     {React.useMemo(() => {
+      {React.useMemo(() => {
         return (
           <audio ref={audioRefMusic} hidden>
             <source src={`${audiovoice}`} type="audio/mp3" />
@@ -238,9 +267,11 @@ function Withdrawl() {
               }}
             >
               ₹{" "}
-              {Number(
-                Number(amount?.wallet || 0) + Number(amount?.winning || 0)
-              )?.toFixed(2)}
+              {type
+                ? Number(amount?.cricket_wallet || 0).toFixed(2)
+                : Number(
+                    Number(amount?.wallet || 0) + Number(amount?.winning || 0)
+                  )?.toFixed(2)}
             </Typography>
             <CachedIcon sx={{ color: "white" }} />
           </Stack>
@@ -488,6 +519,24 @@ function Withdrawl() {
             </Box>
           </Box>
         </Box>
+        <Dialog open={openDialogBox}>
+          <div className="!p-5 !max-w-[300px]">
+            <p className="!font-bold text-center flex-col">
+              <span className="!text-lg">
+                Your withdrawl amount will be add in your bank account within 24
+                Hrs.
+              </span>
+              <p className="!text-green-500">Thank You!</p>
+              <Button
+                onClick={() => setOpenDialogBox(false)}
+                className="!mt-1"
+                variant="contained"
+              >
+                OK
+              </Button>
+            </p>
+          </div>
+        </Dialog>
       </Container>
     </Layout>
   );

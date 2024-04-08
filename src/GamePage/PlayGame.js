@@ -34,15 +34,20 @@ import AccountMenu from "./MenuItems";
 import MyBets from "./MyBets";
 import Top from "./Top";
 import { gray } from "./color";
+import { get_user_data_fn, walletamount } from "../services/apicalling";
+
 const PlayGame = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
   const waiting_aviator = useSelector((state) => state.aviator.waiting_aviator);
   const just_start_after_waiting = useSelector(
     (state) => state.aviator.just_start_after_waiting
   );
   const [waiting_sec, setWaitingSec] = useState(10);
-  const userId = JSON.parse(localStorage.getItem("aviator_data"))?.id;
+  const userId = aviator_login_data && JSON.parse(aviator_login_data)?.id;
   const isMediumScreen = useMediaQuery({ minWidth: 800 });
   const [value, setValue] = React.useState(0);
   const [limit, setlimit] = useState(100);
@@ -52,6 +57,10 @@ const PlayGame = () => {
   const handleClick = (event) => {
     anchorEl === null ? setAnchorEl(event.currentTarget) : setAnchorEl(null);
   };
+
+  useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
 
   function a11yProps(index) {
     return {
@@ -99,20 +108,8 @@ const PlayGame = () => {
     }
   );
 
-  const walletamount = async () => {
-    try {
-      const response = await axios.get(
-        `${endpoint.wallet_data}?userid=${userId}`
-      );
-      return response;
-    } catch (e) {
-      toast(e?.message);
-      console.log(e);
-    }
-  };
-
   const result = data?.data?.data || [];
-  const walletAmount = walletdata?.data || 0;
+  const walletAmount = walletdata?.data?.data || 0;
 
   const initialValue = {
     refetch: 1,
@@ -296,24 +293,29 @@ const PlayGame = () => {
     return (
       <div
         className={`no-scrollbar px-1 py-1 flex gap-1 flex-wrap h-[24px] overflow-x-scroll overflow-y-hidden rounded-full`}
+        style={{ flexDirection: "row-reverse" }} // Scroll from right to left
       >
-        {result?.map((i, index) => {
-          return (
-            <p
-              className={`${
-                index === 0
-                  ? "text-[#e66a81] bg-black "
-                  : index % 2 == 0
-                  ? "text-purple-500 bg-black"
-                  : index % 3 === 0
-                  ? "text-[#01F7F7] bg-black"
-                  : "text-amber-600 bg-black"
-              } rounded-full px-2 text-[10px] overscroll-auto scroll-smooth`}
-            >
-              {i?.result} X
-            </p>
-          );
-        })}
+        {result
+          ?.slice()
+          .reverse()
+          .map((i, index) => {
+            return (
+              <p
+                key={index}
+                className={`${
+                  index === result.length - 1
+                    ? "text-[#e66a81] bg-black"
+                    : index % 2 === 0
+                    ? "text-purple-500 bg-black"
+                    : index % 3 === 0
+                    ? "text-[#01F7F7] bg-black"
+                    : "text-amber-600 bg-black"
+                } rounded-full px-2 text-[10px] overscroll-auto scroll-smooth`}
+              >
+                {i?.result} X
+              </p>
+            );
+          })}
       </div>
     );
   }, [result]);
@@ -372,7 +374,10 @@ const PlayGame = () => {
               ) : (
                 <span className="text-green-700 !text-[15px]">
                   <span className="!font-bold">
-                    {Number(walletAmount?.wallet).toFixed(2) || "0000"}
+                    {Number(
+                      Number(walletAmount?.wallet || 0) +
+                        Number(walletAmount?.winning || 0)
+                    ).toFixed(2) || "0000"}
                   </span>{" "}
                   <span className="!text-white">{rupees}</span>
                 </span>

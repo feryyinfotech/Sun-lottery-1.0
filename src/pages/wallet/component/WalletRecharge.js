@@ -10,7 +10,7 @@ import {
   InputAdornment,
   OutlinedInput,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -33,18 +33,43 @@ import payNameIcon2 from "../../../assets/payNameIcon2.png";
 import Layout from "../../../component/Layout/Layout";
 import { endpoint, rupees } from "../../../services/urls";
 import QRScreen from "./QRScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { get_user_data_fn } from "../../../services/apicalling";
+import CryptoJS from "crypto-js";
 function WalletRecharge() {
+  const [t_id, setT_id] = React.useState();
+  const [callBackResponse, setCallBackResponse] = React.useState();
   // console.log(uuid.v4(), "This is response");
+  let intervalId;
+  const dispatch = useDispatch();
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+
+  const deposit_amount = localStorage.getItem("amount_set");
+  const Deposit_type = localStorage.getItem("Deposit_type");
+  const server_provider = localStorage.getItem("server_provider");
+
   const audioRefMusic = React.useRef(null);
-  const login_data = localStorage.getItem("logindata");
-  const aviator_data = localStorage.getItem("aviator_data");
-  const user_name = JSON.parse(aviator_data)?.username;
-  const user_id = JSON.parse(login_data)?.UserID;
+  const login_data =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null;
+  // const aviator_data = localStorage.getItem("aviator_data");
+  const user_name =
+    aviator_login_data && JSON.parse(aviator_login_data)?.username;
+  const user_id = login_data && JSON.parse(login_data)?.UserID;
   const [deposit_req_data, setDeposit_req_data] = React.useState();
   const [loding, setloding] = React.useState(false);
   const [show_time, set_show_time] = React.useState("0_0");
-  const [amount, setAmount] = React.useState({ wallet: 0, winning: 0 });
-  const client = useQueryClient();
+  const [amount, setAmount] = React.useState({
+    wallet: 0,
+    winning: 0,
+    cricket_wallet: 0,
+  });
 
   const navigate = useNavigate();
   const goBack = () => {
@@ -53,6 +78,10 @@ function WalletRecharge() {
 
   React.useEffect(() => {
     handlePlaySound();
+  }, []);
+
+  React.useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
   }, []);
 
   const handlePlaySound = async () => {
@@ -87,7 +116,7 @@ function WalletRecharge() {
   }, []);
 
   const initialValues = {
-    amount: localStorage.getItem("amount_set") || 100,
+    amount: deposit_amount || 100,
     all_data: { t_id: "", amount: "", date: "" },
   };
 
@@ -95,14 +124,16 @@ function WalletRecharge() {
     initialValues: initialValues,
     validationSchema: cashDepositRequestValidationSchema,
     onSubmit: () => {
+      const transaction_id = `${Date.now()}${user_id}`;
+      setT_id(transaction_id);
       const fd = new FormData();
       fd.append("UserID", "7704002732");
       fd.append("Email", "mailto:sunlottery@gmail.com");
       fd.append("txtamt", fk.values.amount);
       fd.append("Name", user_name);
-      fd.append("TransactionID", `${Date.now()}${user_id}`);
+      fd.append("TransactionID", transaction_id);
 
-      getDepositResponse(fd);
+      // getDepositResponse(fd);
       paymentRequest(fd, fk.values.amount);
       fk.setFieldValue("all_data", {
         t_id: fd.get("TransactionID") || "",
@@ -113,8 +144,9 @@ function WalletRecharge() {
     },
   });
 
+  // sajid api
   async function paymentRequest(fd, amnt) {
-    // setloding(true);
+    setloding(true);
     if (!amnt) {
       toast("Please Enter the amount");
       return;
@@ -128,37 +160,40 @@ function WalletRecharge() {
     fdata.append("user_id", reqbody.user_id);
     fdata.append("amount", reqbody.amount);
     fdata.append("transection_id", reqbody.transection_id);
+    fdata.append("Deposit_type", deposit_amount ? Deposit_type : "Null");
+    fdata.append("server_provider", deposit_amount ? server_provider : "Null");
+
+    if (deposit_amount) {
+      fdata.append("game_type", "1");
+    } else {
+      fdata.append("game_type", "2");
+    }
     try {
       const res = await axios.post(`${endpoint.payment_request}`, fdata);
-      // console.log(res, "responsedatarequestr");
-    } catch (e) {
-      console.log(e);
-    }
-    // setloding(false);
-  }
+      const qr_url = JSON.parse(res?.data?.data) || "";
 
-  async function getDepositResponse(fd) {
-    setloding(true);
-    try {
-      const response = await axios.post(`${endpoint.payment_url}`, fd);
-      // console.log(response?.data, "-------");
-      if (response?.data?.status === "SUCCESS") {
-        setDeposit_req_data(response?.data);
-        toast.success("Payment Request Success!");
+      if (qr_url) {
+        setDeposit_req_data(qr_url);
+      } else {
+        toast("Something went wrong");
       }
     } catch (e) {
-      toast(e?.message);
       console.log(e);
     }
     setloding(false);
   }
 
   React.useEffect(() => {
+    let x = true;
     if (deposit_req_data) {
       let min = 1;
       let sec = 59;
       const interval = setInterval(() => {
         set_show_time(`${min}_${sec}`);
+        if (x) {
+          startGetTimeForCallBack();
+          x = false;
+        }
         sec--;
 
         if (sec < 0) {
@@ -168,7 +203,7 @@ function WalletRecharge() {
           if (min < 0) {
             sec = 59;
             min = 1;
-            console.log("Anand Kumar Verma");
+            stopPrintingHello();
             clearInterval(interval);
             setDeposit_req_data();
             set_show_time("0_0");
@@ -178,6 +213,37 @@ function WalletRecharge() {
       }, 1000);
     }
   }, [deposit_req_data]);
+
+  async function printHello() {
+    try {
+      const res = await axios.get(
+        `${endpoint.recharge_call_bakc}?userid=${user_id}&transectionid=${t_id}`
+      );
+      console.log(res, "Api response");
+      if (res?.data?.payment_status !== "Pending") {
+        setTimeout(() => {
+          setDeposit_req_data();
+          set_show_time("0_0");
+          setloding(false);
+          stopPrintingHello();
+        }, 2000);
+      }
+      if (res?.data?.msg === "Successfully Data Found") {
+        setCallBackResponse(res?.data);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  function startGetTimeForCallBack() {
+    intervalId = setInterval(printHello, 20000);
+  }
+
+  // Function to stop the interval
+  function stopPrintingHello() {
+    clearInterval(intervalId); // Clear the interval using its ID
+  }
 
   const audio = React.useMemo(() => {
     return (
@@ -319,12 +385,17 @@ function WalletRecharge() {
       </>
     );
   }, []);
-
+  // deposit_req_data
   if (deposit_req_data) {
     return (
-      <QRScreen deposit_req_data={deposit_req_data} show_time={show_time} />
+      <QRScreen
+        callBackResponse={callBackResponse}
+        deposit_req_data={deposit_req_data}
+        show_time={show_time}
+      />
     );
   }
+
   return (
     <Layout>
       {audio}
@@ -402,9 +473,11 @@ function WalletRecharge() {
             >
               {" "}
               ₹{" "}
-              {Number(
-                Number(amount?.wallet || 0) + Number(amount?.winning || 0)
-              )?.toFixed(2)}
+              {deposit_amount
+                ? Number(amount?.cricket_wallet || 0)?.toFixed(2)
+                : Number(
+                    Number(amount?.wallet || 0) + Number(amount?.winning || 0)
+                  )?.toFixed(2)}
             </Typography>
             <CachedIcon sx={{ color: "white" }} />
           </Stack>

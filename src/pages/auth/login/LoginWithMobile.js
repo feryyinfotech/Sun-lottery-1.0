@@ -24,7 +24,8 @@ import { zubgmid } from "../../../Shared/color";
 import { endpoint } from "../../../services/urls";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { storeCookies } from "../../../Shared/CookieStorage";
-
+import poster from "../../../assets/images/poster2.jpg";
+import CryptoJS from 'crypto-js'
 function LoginWithMobile() {
   // const device_id = uuid.v4();
   const [showPassword, setShowPassword] = React.useState(false);
@@ -38,7 +39,7 @@ function LoginWithMobile() {
   const initialValue = {
     mob: "",
     pass: "",
-    isAllowCheckBox:false
+    isAllowCheckBox: false,
     // device_id: device_id || uuid.v4(),
   };
 
@@ -46,11 +47,11 @@ function LoginWithMobile() {
     initialValues: initialValue,
     validationSchema: LoginMobileSchemaValidaton,
     onSubmit: () => {
-      if(!fk.values.isAllowCheckBox) {
-        toast("Plese Check Remember Password!")
-        return
+      if (!fk.values.isAllowCheckBox) {
+        toast("Plese Check Remember Password!");
+        return;
       }
-      
+
       const reqbody = {
         username: fk.values.mob,
         password: fk.values.pass,
@@ -73,14 +74,15 @@ function LoginWithMobile() {
 
       toast.success(response?.data?.msg);
       if (response?.data?.error === "200") {
-        localStorage.setItem("logindata", JSON.stringify(response?.data));
+        const value = CryptoJS.AES.encrypt(JSON.stringify(response?.data), "anand")?.toString();
+        localStorage.setItem("logindataen", value);
         sessionStorage.setItem("isAvailableUser", true);
         sessionStorage.setItem("isAvailableCricketUser", true);
         // get_user_data(response?.data?.UserID);
         setloding(false);
-        storeCookies()
+        storeCookies();
         navigate("/dashboard");
-        window.location.reload()
+        window.location.reload();
       }
     } catch (e) {
       toast.error(e?.message);
@@ -181,14 +183,29 @@ function LoginWithMobile() {
           {fk.touched.pass && fk.errors.pass && (
             <div className="error">{fk.errors.pass}</div>
           )}
+          <p className="!text-end col-span-1 ">
+            <span
+              className="!text-white !cursor-pointer"
+              onClick={() => navigate("/forget-password")}
+            >
+              Forget Password?
+            </span>
+          </p>
         </FormControl>
       </Box>
       <Box mt={1}>
         <FormControl fullWidth>
           <FormControlLabel
             required
-            onClick={()=>fk.setFieldValue("isAllowCheckBox",!fk.values.isAllowCheckBox)}
-            control={<Checkbox checked={fk.values.isAllowCheckBox} sx={{ color: "black !important" }} />}
+            onClick={() =>
+              fk.setFieldValue("isAllowCheckBox", !fk.values.isAllowCheckBox)
+            }
+            control={
+              <Checkbox
+                checked={fk.values.isAllowCheckBox}
+                sx={{ color: "black !important" }}
+              />
+            }
             label="Remember password"
             sx={{ color: "white" }}
           />

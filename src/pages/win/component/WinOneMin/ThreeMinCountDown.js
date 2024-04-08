@@ -3,12 +3,11 @@ import { Box, IconButton, Stack, Typography } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
-import { useFormik } from "formik";
 import * as React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useQueryClient } from "react-query";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../../../Shared/SocketContext";
 import countdownfirst from "../../../../assets/countdownfirst.mp3";
 import countdownlast from "../../../../assets/countdownlast.mp3";
@@ -31,7 +30,7 @@ import Policy from "../policy/Policy";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-const ThreeMinCountDown = () => {
+const ThreeMinCountDown = ({fk}) => {
   const socket = useSocket();
   const dispatch = useDispatch();
   const client = useQueryClient();
@@ -45,9 +44,7 @@ const ThreeMinCountDown = () => {
   const img3 = Number(isImageChange?.split("_")[2]);
   const img4 = Number(isImageChange?.split("_")[3]);
   const img5 = Number(isImageChange?.split("_")[4]);
-  const nextStpe =
-    client.getQueriesData("gamehistory")?.[0]?.[1]?.data?.data?.[0]?.gamesno ||
-    0;
+  const next_step = useSelector((state) => state.aviator.next_step)
 
   const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
   React.useEffect(() => {
@@ -62,35 +59,16 @@ const ThreeMinCountDown = () => {
     () => String(one_min_time?.split("_")?.[0]).padStart(2, "0"),
     [one_min_time]
   );
-
-  // React.useEffect(() => {
-  //   if (show_this_three_min_time_sec === "01") {
-  //     oneMinCheckResult();
-  //     oneMinColorWinning();
-  //   }
-  // }, [show_this_three_min_time_sec]);
-
   const handleClickOpenpoicy = () => {
     setpoicy(true);
   };
   const handleClosepolicy = () => {
     setpoicy(false);
   };
-
-  const initialValues = {
-    openTimerDialogBox: false,
-  };
-
-  const fk = useFormik({
-    initialValues: initialValues,
-    onSubmit: () => {
-      console.log(fk.values);
-    },
-  });
-
   React.useEffect(() => {
     const handleFiveMin = (fivemin) => {
       setOne_min_time(fivemin);
+      fk.setFieldValue("show_this_one_min_time",fivemin)
       if (
         (fivemin?.split("_")?.[1] === "5" ||
           fivemin?.split("_")?.[1] === "4" ||
@@ -103,20 +81,30 @@ const ThreeMinCountDown = () => {
         handlePlaySoundLast();
 
       if (
-        fivemin?.split("_")?.[1] === "5" &&
-        fivemin?.split("_")?.[0] === "0"
+        Number(fivemin?.split("_")?.[1]) <= 10 && // this is for sec
+        fivemin?.split("_")?.[0] === "0" // this is for minut
       ) {
-        fk.setFieldValue("openTimerDialogBox", true);
+        fk.setFieldValue("openTimerDialogBoxOneMin", true);
       }
-      if (fivemin?.split("_")?.[1] === "0") {
-        fk.setFieldValue("openTimerDialogBox", false);
+      if (fivemin?.split("_")?.[1] === "59") {
+        fk.setFieldValue("openTimerDialogBoxOneMin", false);
+      }
+      if (
+        fivemin?.split("_")?.[1] === "40" && // this is for sec
+        fivemin?.split("_")?.[0] === "0" // this is for minut
+      ) {
+        oneMinCheckResult();
+        oneMinColorWinning();
       }
       if (
         fivemin?.split("_")?.[1] === "0" &&
         fivemin?.split("_")?.[0] === "0"
       ) {
-        oneMinCheckResult();
-        oneMinColorWinning();
+        client.refetchQueries("gamehistory");
+        client.refetchQueries("gamehistory_chart");
+        client.refetchQueries("myhistory");
+        client.refetchQueries("myAllhistory");
+        dispatch(dummycounterFun());
       }
     };
 
@@ -130,10 +118,7 @@ const ThreeMinCountDown = () => {
   const oneMinCheckResult = async () => {
     try {
       await axios.get(`${endpoint.check_result}`);
-      client.refetchQueries("gamehistory");
-      client.refetchQueries("gamehistory_chart");
-      client.refetchQueries("myhistory");
-      dispatch(dummycounterFun());
+     
     } catch (e) {
       toast(e?.message);
       console.log(e);
@@ -297,11 +282,11 @@ const ThreeMinCountDown = () => {
             }, [show_this_three_min_time_sec])}
           </Stack>
           <Typography variant="h3" color="initial" className="winTexttwo">
-          {(Number(nextStpe) + 1)?.toString()?.padStart(7,"0")}
+          {(Number(next_step))?.toString()?.padStart(7,"0")}
           </Typography>
         </Box>
       </Box>
-      {fk.values.openTimerDialogBox && (
+      {/* {fk.values.openTimerDialogBox && (
         <Dialog
           open={fk.values.openTimerDialogBox}
           TransitionComponent={Transition}
@@ -345,7 +330,7 @@ const ThreeMinCountDown = () => {
             </div>
           </div>
         </Dialog>
-      )}
+      )} */}
     </Box>
   );
 };

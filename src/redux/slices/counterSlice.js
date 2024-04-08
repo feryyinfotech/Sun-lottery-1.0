@@ -20,6 +20,9 @@ export const slice = createSlice({
     just_start_after_waiting:true,
     please_reconnect_the_server:false,
     dummycounter:1,
+    next_step:1,
+    pendingIds:[],
+    aviator_login_data:null
   },
   reducers: {
     // main music and sound enabling and dessabling
@@ -56,6 +59,15 @@ export const slice = createSlice({
     dummycounterFun: (state) => {
       state.dummycounter += 1;
     },
+    updateNextCounter: (state,actions) => {
+      state.next_step= actions.payload;
+    },
+    pendingIdsFunction: (state,actions) => {
+      state.pendingIds = actions.payload;
+    },
+    aviator_login_data_fn: (state,actions) => {
+      state.aviator_login_data = actions.payload;
+    },
   },
 });
 
@@ -69,7 +81,10 @@ export const {
   waitingAviatorFun,
   just_start_after_waitingFun,
   please_reconnect_the_serverFun,
-  dummycounterFun
+  dummycounterFun,
+  updateNextCounter,
+  pendingIdsFunction,
+  aviator_login_data_fn
 } = slice.actions;
 
 // export const incrementAsync = amount => dispatch => {

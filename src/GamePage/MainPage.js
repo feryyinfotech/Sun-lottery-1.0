@@ -9,11 +9,15 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { endpoint } from "../services/urls";
 import CustomDialogBox from "../Shared/CustomDialogBox";
-
+import { useDispatch,useSelector } from "react-redux";
+import { get_user_data_fn } from "../services/apicalling";
 const MainPage = () => {
   const isMediumScreen = useMediaQuery({ minWidth: 800 })
+  const dispatch = useDispatch()
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
 
-  const logindata = localStorage.getItem("aviator_data");
   const navigate = useNavigate();
   let [searchParams, setSearchParams] = useSearchParams();
   const param_data =  searchParams.get("zupee_ferry_aviator")?.at(-1)
@@ -51,7 +55,7 @@ const MainPage = () => {
      
 
       if (response?.data?.error === "200") {
-        localStorage.setItem("aviator_data", JSON.stringify(response?.data?.data));
+        // localStorage.setItem("aviator_data", JSON.stringify(response?.data?.data));
         navigate("/playgame");
       }
     } catch (e) {
@@ -61,7 +65,11 @@ const MainPage = () => {
   };
 
   useEffect(() => {
-    logindata && navigate("/playgame");
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
+
+  useEffect(() => {
+    aviator_login_data && navigate("/playgame");
   }, []);
 
   return (

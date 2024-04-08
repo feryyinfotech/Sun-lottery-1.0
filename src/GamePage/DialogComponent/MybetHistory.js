@@ -1,16 +1,23 @@
 import { CircularProgress, Divider } from "@mui/material";
 import axios from "axios";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { BiMessageRounded } from "react-icons/bi";
 import { BsSignTurnRight } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { endpoint } from "../../services/urls";
-
+import { get_user_data_fn } from "../../services/apicalling";
+import { useDispatch,useSelector } from "react-redux";
 const MybetHistory = () => {
   const logindata = localStorage.getItem("aviator_data");
-  const userId = JSON.parse(logindata)?.id;
+
+  const dispatch = useDispatch()
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+
+  const userId = aviator_login_data && JSON.parse(aviator_login_data)?.id;
 
   const [limit, setlimit] = useState(10);
   const { isLoading, data } = useQuery(
@@ -21,6 +28,7 @@ const MybetHistory = () => {
       refetchOnReconnect: true,
     }
   );
+
 
   const getHistory = async () => {
     try {
@@ -35,6 +43,10 @@ const MybetHistory = () => {
   };
 
   const result = data?.data?.data || [];
+
+  useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
 
 
   if (isLoading)

@@ -7,21 +7,33 @@ import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import { useQueryClient } from "react-query";
 import { gray } from "./color";
 import { endpoint, rupees } from "../services/urls";
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import { useDispatch,useSelector } from "react-redux";
+import { get_user_data_fn } from "../services/apicalling";
+
 const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   const client = useQueryClient();
   const spent_amount2 = localStorage.getItem("spent_amount2");
+  const dispatch = useDispatch()
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+  const amount_total =
+    client.getQueriesData("walletamount_aviator")?.[0]?.[1]?.data?.data || 0;
+  const pre_amount = Number(
+    Number(amount_total?.wallet || 0) + Number(amount_total?.winning || 0)
+  ).toFixed(2);
 
-  const pre_amount =
-    client.getQueriesData("walletamount_aviator")?.[0]?.[1]?.data?.wallet || 0;
   const [loding, setloding] = useState(false);
-  const logindata = localStorage.getItem("aviator_data");
+  // const logindata = localStorage.getItem("aviator_data");
   const [selectedValue, setSelectedValue] = useState("Bet");
   const [betValue, setBetValue] = useState(10);
   // const [openCustomDialogBox, setOpenCustomDialogBox] = useState(false);
   const [gameno, setgameno] = useState({});
+
+
+  useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
 
   const initialValues = {
     custombetValue_auto_cash_out: (1.1).toFixed(2) || 0,
@@ -38,7 +50,7 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   const spentBit = async () => {
     setloding(true);
     const reqbody = {
-      userid: JSON.parse(logindata)?.id || 2,
+      userid: aviator_login_data && JSON.parse(aviator_login_data)?.id || 2,
       amount: betValue || 0,
     };
     try {
@@ -77,7 +89,7 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   }, [fk.values.isFlying]);
 
   const getHistory = async () => {
-    const userid = JSON.parse(logindata)?.id || 2;
+    const userid =aviator_login_data &&  JSON.parse(aviator_login_data)?.id || 2;
 
     try {
       const response = await axios.get(
@@ -92,7 +104,7 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
 
   const cashOut = async (sec, mili) => {
     const reqbody = {
-      userid: JSON.parse(logindata)?.id || 2,
+      userid:aviator_login_data &&  JSON.parse(aviator_login_data)?.id || 2,
       amount: betValue || 0,
       gameno: gameno,
       multiplier: Number(`${sec}.${mili}`),

@@ -1,11 +1,13 @@
 import CachedIcon from "@mui/icons-material/Cached";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
-import toast from "react-hot-toast";
+import { useQuery } from "react-query";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
-import { zubgcrickblue, zubgcrickorange, zubgcrickgred } from "../../Shared/color";
+import {
+  zubgcrickorange
+} from "../../Shared/color";
 import cip from "../../assets/cip.png";
 import deposit from "../../assets/deposit.png";
 import card from "../../assets/images/card-payment.png";
@@ -19,13 +21,38 @@ import deposite from "../../assets/images/payment.png";
 import balance from "../../assets/images/send.png";
 import trans from "../../assets/images/translation.png";
 import Layout from "../../component/Layout/Layout";
+import {
+  MyProfileDataFn,
+  get_user_data_fn,
+  walletamount,
+} from "../../services/apicalling";
 import SplashScreen from "../SplashScreen";
-import { useQuery } from "react-query";
-import { MyProfileDataFn } from "../../services/apicalling";
+
 function CricketUserprofile() {
   const [showSplashScreen, setShowSplashScreen] = useState(false);
+  const dispatch = useDispatch();
+  const aviator_login_data = useSelector(
+    (state) => state.aviator.aviator_login_data
+  );
+
   const isAvailableUser = sessionStorage.getItem("isAvailableCricketUser");
   const navigate = useNavigate();
+
+  const { isLoading: walletLoding, data: wallet } = useQuery(
+    ["userWalletAmount"],
+    () => walletamount(),
+    {
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+    }
+  );
+
+  const amount = wallet?.data?.data;
+
+  useEffect(() => {
+    !aviator_login_data && get_user_data_fn(dispatch);
+  }, []);
+
   const handleClosepolicy = () => {
     setShowSplashScreen(false);
     sessionStorage.removeItem("isAvailableCricketUser");
@@ -48,46 +75,10 @@ function CricketUserprofile() {
   });
   const result = data?.data?.data;
 
-  const state = {
-    series: [44, 55, 67, 83],
-    options: {
-      chart: {
-        height: 350,
-        type: "radialBar",
-      },
-      plotOptions: {
-        radialBar: {
-          dataLabels: {
-            name: {
-              fontSize: "22px",
-            },
-            value: {
-              fontSize: "16px",
-              color: 'white'
-            },
-            total: {
-              show: true,
-              label: "Run",
-              formatter: function (w) {
-                // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
-                return 249
-              },
-              style: {
-                fontSize: "16px",
-                colors: ["#fff"], // Set the color to white
-              },
-            },
-          },
-        },
-      },
-      labels: ["Rank", "Team", "Rating", "Point"],
-    },
-  };
-
   if (showSplashScreen) return <SplashScreen />;
   return (
     <Layout footer={false}>
-      <Container sx={style.container} >
+      <Container sx={style.container}>
         <Stack direction="row" sx={style.header}>
           <Box sx={style.profileBox}>
             <Box
@@ -99,75 +90,86 @@ function CricketUserprofile() {
               sx={style.profileImage}
             />
           </Box>
-          <Box sx={style.userInfo}
-          // onClick={() => navigate('/cricket/registration')}
+          <Button component={NavLink} to='/cricket/registration' className="playnow !cursor-pointer !bg-[#FB8356]" role="Button" sx={style.button} >Play Now</Button>
+          <Box
+            sx={style.userInfo}
+            // onClick={() => navigate('/cricket/registration')}
           >
-            <Typography variant="" sx={{ color: 'white !important' }}>
-            {result?.full_name}
+            <Typography variant="" sx={{ color: "white !important" }}>
+              {result?.full_name}
             </Typography>
-            <Typography variant="body1" sx={{ color: 'white !important' }}>
+            <Typography variant="body1" sx={{ color: "white !important" }}>
               UID | {result?.custid || 0}
             </Typography>
           </Box>
         </Stack>
         <Box sx={style.balanceContainer}>
-          <Box sx={{
-            color: "white !important",
-            background: '#00ff5533', padding: '10px', borderRadius: '5px',
-          }}>
+          <Box
+            sx={{
+              color: "white !important",
+              background: "#00ff5533",
+              padding: "10px",
+              borderRadius: "5px",
+            }}
+          >
             <Stack direction="row" sx={{ alignItems: "center" }}>
               <Box component="img" src={balance} sx={style.cardImage} />
-              <Typography
-                variant="body1"
-
-                sx={style.balanceText}
-              >
+              <Typography variant="body1" sx={style.balanceText}>
                 Wallet Amount
               </Typography>
             </Stack>
             <Stack direction="row" sx={{ alignItems: "center", mt: "10px" }}>
-              <Typography
-                variant="body1"
-
-                sx={style.totalBalance}
-              >
-                ₹0
+              <Typography variant="body1" sx={style.totalBalance}>
+                ₹ {Number(amount?.cricket_wallet || 0).toFixed(2)}
               </Typography>
               <CachedIcon sx={style.cachedIcon} />
             </Stack>
-            <Stack direction="row" sx={{ alignItems: "center", mt: "10px", justifyContent: 'space-between' }}>
+            <Stack
+              direction="row"
+              sx={{
+                alignItems: "center",
+                mt: "10px",
+                justifyContent: "space-between",
+              }}
+            >
               <Box component="img" src={cip} sx={style.cardImage} />
               <Typography variant="body1" sx={style.cardNumber}>
                 *** *** *** ***
               </Typography>
             </Stack>
           </Box>
-          <Box sx={{ background: zubgcrickorange, mt: 1.2, borderRadius: '5px', }}>
-            <ReactApexChart
-              options={state.options}
-              series={state.series}
-              type="radialBar"
-            />
-          </Box>
         </Box>
-        <Box
-          className="wallet-track-box"
-          sx={{ background: zubgcrickorange }}
-        >
+        <Box className="wallet-track-box" sx={{ background: zubgcrickorange }}>
+          {/* nav: "/cricket/withdrawlCash", */}
           <Stack
             direction="row"
             className="!w-full !grid lg:!grid-cols-4 !grid-cols-2 !gap-[4px]"
           >
             {[
-              { img: rechargeIcon, item: "Deposit", nav: "/cricket/fund-deposit-request-form" },
-              { img: withdrow, item: "Withdraw", nav: "/cricket/withdrawlCash" },
-              { img: wdhistory, item: "Deposit history", nav: "/cricket/deposit-history" },
-              { img: deposite, item: "Withdrawal history", nav: "/cricket/withdrawl-history" },
+              {
+                img: rechargeIcon,
+                item: "Deposit",
+                nav: "/cricket/fund-deposit-request-form",
+              },
+              {
+                img: withdrow,
+                item: "Withdraw",
+                nav: "/Withdrawal",
+              },
+              {
+                img: wdhistory,
+                item: "Deposit history",
+                nav: "/cricket/deposit-history",
+              },
+              {
+                img: deposite,
+                item: "Withdrawal history",
+                nav: "/cricket/withdrawl-history",
+              },
             ].map((i) => {
               return (
                 <Box
                   sx={{
-
                     display: "flex",
                     alignItems: "center",
                     flexDirection: "column",
@@ -179,27 +181,42 @@ function CricketUserprofile() {
                     },
 
                     "&>a>img": { margin: "auto" },
-
                   }}
                   className={"!bg-[#00ff5533]  !rounded-lg !py-2"}
                 >
-                  <NavLink to={i.nav}>
+                  <div
+                    className="!text-center !flex flex-col !justify-center !items-center"
+                    onClick={() => {
+                      if (i.item === "Withdraw") {
+                        navigate(i?.nav, {
+                          state: {
+                            type: "cricket",
+                          },
+                        });
+                      } else {
+                        navigate(i?.nav);
+                      }
+                    }}
+                  >
                     <Box component="img" src={i.img} width={50}></Box>
-                    <Typography variant="body1" mt={1}>
+                    <Typography variant="body1" mt={1} className="!text-white">
                       {i.item}
                     </Typography>
-                  </NavLink>
+                  </div>
                 </Box>
               );
             })}
           </Stack>
         </Box>
-        <Box className={"!w-[95%] !grid !grid-cols-2 !gap-2 !mt-3"} sx={style.balanceContainer}>
+        <Box
+          className={"!w-[95%] !grid !grid-cols-2 !gap-2 !mt-3"}
+          sx={style.balanceContainer}
+        >
           <Box
             className={"!cursor-pointer"}
             onClick={() => navigate("/cricket/deposit-history")}
             sx={{
-              background: '#00ff5533',
+              background: "#00ff5533",
               padding: "10px",
               borderRadius: "10px",
             }}
@@ -228,9 +245,7 @@ function CricketUserprofile() {
                 <Typography variant="body1" className="!text-sm">
                   Deposit
                 </Typography>
-                <Typography variant="body1" >
-                  My Deposit history
-                </Typography>
+                <Typography variant="body1">My Deposit history</Typography>
               </Box>
             </Stack>
           </Box>
@@ -238,7 +253,7 @@ function CricketUserprofile() {
             className={"!cursor-pointer"}
             onClick={() => navigate("/cricket/withdrawl-history")}
             sx={{
-              background: '#00ff5533',
+              background: "#00ff5533",
               padding: "10px",
               borderRadius: "10px",
             }}
@@ -266,9 +281,7 @@ function CricketUserprofile() {
                 <Typography variant="body1" className="!text-sm">
                   Withdrawl
                 </Typography>
-                <Typography variant="body1" >
-                  My Withdrawl history
-                </Typography>
+                <Typography variant="body1">My Withdrawl history</Typography>
               </Box>
             </Stack>
           </Box>
@@ -294,7 +307,6 @@ function CricketUserprofile() {
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
-
             >
               <Stack direction="row" sx={{ alignItems: "center" }}>
                 <Box
@@ -304,7 +316,6 @@ function CricketUserprofile() {
                 ></Box>
                 <Typography
                   variant="body1"
-
                   sx={{ color: "white", fontSize: "13px", fontWeight: "600" }}
                 >
                   Notification
@@ -325,7 +336,6 @@ function CricketUserprofile() {
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
-
             >
               <Stack direction="row" sx={{ alignItems: "center" }}>
                 <Box
@@ -335,7 +345,6 @@ function CricketUserprofile() {
                 ></Box>
                 <Typography
                   variant="body1"
-
                   sx={{ color: "white", fontSize: "13px", fontWeight: "600" }}
                 >
                   Gifts
@@ -356,7 +365,6 @@ function CricketUserprofile() {
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
-
             >
               <Stack direction="row" sx={{ alignItems: "center" }}>
                 <Box
@@ -366,7 +374,6 @@ function CricketUserprofile() {
                 ></Box>
                 <Typography
                   variant="body1"
-
                   sx={{ color: "white", fontSize: "13px", fontWeight: "600" }}
                 >
                   Game statistics
@@ -387,7 +394,6 @@ function CricketUserprofile() {
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
-
             >
               <Stack direction="row" sx={{ alignItems: "center" }}>
                 <Box
@@ -397,7 +403,6 @@ function CricketUserprofile() {
                 ></Box>
                 <Typography
                   variant="body1"
-
                   sx={{ color: "white", fontSize: "13px", fontWeight: "600" }}
                 >
                   Language
@@ -420,7 +425,6 @@ function CricketUserprofile() {
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
-
             >
               <Stack direction="row" sx={{ alignItems: "center" }}>
                 <Box
@@ -430,7 +434,6 @@ function CricketUserprofile() {
                 ></Box>
                 <Typography
                   variant="body1"
-
                   sx={{ color: "white", fontSize: "13px", fontWeight: "600" }}
                 >
                   Total Match
@@ -454,11 +457,11 @@ function CricketUserprofile() {
 export default CricketUserprofile;
 
 const style = {
-  container: { background: '#005543' },
+  container: { background: "#005543" },
   header: {
-    width: '95%',
-    marginLeft: '2.5%',
-    px: '10px',
+    width: "95%",
+    marginLeft: "2.5%",
+    px: "10px",
     alignItems: "center",
     justifyContent: "space-between",
     py: "20px",
@@ -487,8 +490,8 @@ const style = {
     background: zubgcrickorange,
     borderRadius: "10px",
     padding: "10px",
-    width: '95%',
-    marginLeft: '2.5%',
+    width: "95%",
+    marginLeft: "2.5%",
   },
   balanceText: {
     fontSize: "16px",

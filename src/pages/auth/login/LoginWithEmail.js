@@ -24,7 +24,7 @@ import { LoginEmailSchemaValidaton } from "../../../Shared/Validation";
 import { zubgmid } from "../../../Shared/color";
 import { endpoint } from "../../../services/urls";
 import { storeCookies } from "../../../Shared/CookieStorage";
-
+import CryptoJS from "crypto-js";
 function LoginWithEmail() {
   // const device_id = uuid.v4();
   const [loding, setloding] = useState(false);
@@ -38,7 +38,7 @@ function LoginWithEmail() {
   const initialValue = {
     email: "",
     pass: "",
-    isAllowCheckBox:false
+    isAllowCheckBox: false,
     // device_id: device_id || uuid.v4(),
   };
 
@@ -46,9 +46,9 @@ function LoginWithEmail() {
     initialValues: initialValue,
     validationSchema: LoginEmailSchemaValidaton,
     onSubmit: () => {
-      if(!fk.values.isAllowCheckBox) {
-        toast("Plese Check Remember Password!")
-        return
+      if (!fk.values.isAllowCheckBox) {
+        toast("Plese Check Remember Password!");
+        return;
       }
       console.log(fk.values);
       if (fk.values.pass && (fk.values.mob || fk.values.email)) {
@@ -76,15 +76,16 @@ function LoginWithEmail() {
       toast.success(response?.data?.msg);
       console.log(response);
       if (response?.data?.error === "200") {
-        localStorage.setItem("logindata", JSON.stringify(response?.data));
+        const value = CryptoJS.AES.encrypt(JSON.stringify(response?.data), "anand")?.toString();
+        localStorage.setItem("logindataen", value);
+        // localStorage.setItem("logindata", JSON.stringify(response?.data));
         sessionStorage.setItem("isAvailableUser", true);
         sessionStorage.setItem("isAvailableCricketUser", true);
         // get_user_data(response?.data?.UserID);
         setloding(false);
-        storeCookies()
+        storeCookies();
         navigate("/dashboard");
         window.location.reload();
-
       }
     } catch (e) {
       toast.error(e?.message);
@@ -201,8 +202,15 @@ function LoginWithEmail() {
         <FormControl fullWidth>
           <FormControlLabel
             required
-            onClick={()=>fk.setFieldValue("isAllowCheckBox",!fk.values.isAllowCheckBox)}
-            control={<Checkbox checked={fk.values.isAllowCheckBox} sx={{ color: "black !important" }} />}
+            onClick={() =>
+              fk.setFieldValue("isAllowCheckBox", !fk.values.isAllowCheckBox)
+            }
+            control={
+              <Checkbox
+                checked={fk.values.isAllowCheckBox}
+                sx={{ color: "black !important" }}
+              />
+            }
             label="Remember password"
             sx={{ color: "white" }}
           />
