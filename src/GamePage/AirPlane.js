@@ -169,7 +169,7 @@ const AirPlane = ({ formik, fk }) => {
       // fk.setFieldValue("isFlying", false);
       fk.setFieldValue("waitingForNextTime1", false);
       fk.setFieldValue("waitingForNextTime2", false);
-      setResultFuncton();
+      // setResultFuncton();
       formik.setFieldValue("refetch", Number(formik.values.refetch) + 1);
       mainDiv.style.animation = "";
       clearInterval(timerInterval);

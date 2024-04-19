@@ -32,7 +32,7 @@ function DepositBonus() {
   );
   const res = data?.data?.data;
 
-  if (!res)
+  if (!isLoading && !res)
   return (
     <Layout>
       <Container

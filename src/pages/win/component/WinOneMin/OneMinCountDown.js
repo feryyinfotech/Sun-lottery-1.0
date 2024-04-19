@@ -2,10 +2,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
-import axios from "axios";
 import * as React from "react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../../../Shared/SocketContext";
@@ -25,7 +23,6 @@ import circle from "../../../../assets/images/circle-arrow.png";
 import howToPlay from "../../../../assets/images/user-guide.png";
 import { dummycounterFun } from "../../../../redux/slices/counterSlice";
 import { changeImages } from "../../../../services/schedular";
-import { endpoint } from "../../../../services/urls";
 import Policy from "../policy/Policy";
 
 const Transition = React.forwardRef(function Transition(props, ref) {

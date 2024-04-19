@@ -54,6 +54,7 @@ import AddBankDetails from "../pages/account/Component/AddBankDetails";
 import AddedBankDetailList from "../pages/account/Component/AddedBankDetailList";
 import QRScreen from "../pages/wallet/component/QRScreen";
 import TeamData from "../pages/promotion/component/TeamData";
+import TronScanPage from "../pages/trx/component/TronScanPage";
 
 export const routes = [
     {
@@ -283,5 +284,9 @@ export const routes = [
     {
         path: "/deposit/qr-screen",
         component: <QRScreen />
+    },
+    {
+        path: "/trx/tron-scan",
+        component: <TronScanPage />
     },
 ]

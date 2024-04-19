@@ -28,27 +28,37 @@ import balance from "../../assets/images/send.png";
 import audiovoice from "../../assets/images/withdrawol_voice.mp3";
 import Layout from "../../component/Layout/Layout";
 import { BankListDetails, get_user_data_fn } from "../../services/apicalling";
-import { endpoint } from "../../services/urls";
+import { endpoint, rupees } from "../../services/urls";
 import { useLocation } from "react-router-dom";
-import { useDispatch,useSelector } from "react-redux";
-import CryptoJS from 'crypto-js'
+import { useDispatch, useSelector } from "react-redux";
+import CryptoJS from "crypto-js";
 function Withdrawl() {
   const location = useLocation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
   const { type } = location.state || {};
-  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null;
-  const first_rechange =aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
+  const login_data =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null;
+  const first_rechange =
+    aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
 
   const user_id = login_data && JSON.parse(login_data)?.UserID;
-  const [amount, setAmount] = React.useState({ wallet: 0, winning: 0,cricket_wallet:0 });
+  const [amount, setAmount] = React.useState({
+    wallet: 0,
+    winning: 0,
+    cricket_wallet: 0,
+  });
   const [lodint, setloding] = React.useState(false);
   const audioRefMusic = React.useRef(null);
   const [openDialogBox, setOpenDialogBox] = React.useState(false);
-  
-  
+
   React.useEffect(() => {
     !aviator_login_data && get_user_data_fn(dispatch);
   }, []);
@@ -85,8 +95,6 @@ function Withdrawl() {
     }
   );
   const result = React.useMemo(() => data?.data?.data, [data]);
-
-  console.log(result, "msg added");
 
   const initialValues = {
     amount: "",
@@ -156,8 +164,20 @@ function Withdrawl() {
         walletamountFn();
         fk.handleReset();
         setOpenDialogBox(true);
-      }else{
-        toast(response?.data?.msg)
+      } else {
+        if (response?.data?.msg === "") {
+          toast(
+            <div>
+              {response?.data?.msg} First, you have to place a bet of{" "}
+              <span className="!text-lg !text-[#FBA343] !font-bold">
+                {rupees} {response?.data?.remaining_bet && response?.data?.remaining_bet}
+              </span>{" "}
+              rupees before you can withdraw
+            </div>
+          );
+        } else {
+          toast(response?.data?.msg);
+        }
       }
     } catch (e) {
       toast(e?.message);

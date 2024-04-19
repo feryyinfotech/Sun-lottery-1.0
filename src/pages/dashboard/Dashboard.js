@@ -127,6 +127,8 @@ function Dashboard() {
     top11WinnerFunction();
   }, []);
 
+  console.log(winnner_data, "This is winner data");
+
   const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
     refetchOnMount: false,
     refetchOnReconnect: true,
@@ -523,7 +525,8 @@ function Dashboard() {
                     if (
                       i.name === "Slots" ||
                       i.name === "Popular" ||
-                      i.name === "Casino"
+                      i.name === "Casino" ||
+                      i.name === "Aviator"
                     )
                       return toast("Comming Soon !");
                     scrollToSection("games");

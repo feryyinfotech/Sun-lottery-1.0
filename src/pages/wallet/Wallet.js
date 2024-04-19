@@ -1,5 +1,5 @@
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Container, Dialog, IconButton, Stack, Typography } from "@mui/material";
 import * as React from "react";
 import ReactApexChart from "react-apexcharts";
 import { useQuery } from "react-query";
@@ -14,16 +14,19 @@ import deposite from "../../assets/images/payment.png";
 import wallet from "../../assets/images/wallet.png";
 import Layout from "../../component/Layout/Layout";
 import { MyProfileDataFn } from "../../services/apicalling";
+import CloseIcon from "@mui/icons-material/Close";
+import sunlotteryhomebanner from "../../assets/sunlotteryhomebanner.jpg";
 
 function Wallet() {
   const isMediumScreen = useMediaQuery({ minWidth: 800 });
   const navigate = useNavigate();
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = React.useState(true);
   const { isLoading, data } = useQuery(["myprofile"], () => MyProfileDataFn(), {
     refetchOnMount: false,
     refetchOnReconnect: true,
   });
   const result = data?.data?.data;
-  console.log(result, "This is profile data")
+
   const main_wallet = {
     series: [(
       Number(result?.bonus || 0)
@@ -341,7 +344,7 @@ function Wallet() {
               }}
             >
               <NavLink
-              //  to="/wallet/Recharge"
+               to="/wallet/Recharge"
                >
                 <Box component="img" src={rechargeIcon} width={50}></Box>
                 <Typography variant="body1" color="initial" mt={1}>
@@ -366,7 +369,7 @@ function Wallet() {
               }}
             >
               <NavLink 
-              // to="/Withdrawal"
+              to="/Withdrawal"
               >
                 <Box component="img" src={withdrow} width={50}></Box>
                 <Typography variant="body1" color="initial" mt={1}>
@@ -495,6 +498,20 @@ function Wallet() {
             </Box>
           </Box>
         </Box>
+        {openDialogBoxHomeBanner && (
+          <Dialog PaperProps={{width:"500px",height:"500px"}} open={openDialogBoxHomeBanner}>
+            <div>
+              <p>
+                <IconButton onClick={() => setopenDialogBoxHomeBanner(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </p>
+              <p>
+                <img  src={sunlotteryhomebanner} />
+              </p>
+            </div>
+          </Dialog>
+        )}
         <CustomCircularProgress isLoading={isLoading} />
       </Container>
     </Layout>

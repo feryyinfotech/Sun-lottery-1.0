@@ -461,6 +461,15 @@ img {
   margin-left: 2.5%;
   border-radius: 10PX;
 }
+.countdownbgtrx {
+  background-size: 100% 100%;
+  background-position: center;
+  padding: 15px 10px;
+  margin-top: 20px;
+  width: 95%;
+  margin-left: 2.5%;
+  border-radius: 10PX;
+}
 
 .win-banner>div:nth-child(1) {
   display: flex;

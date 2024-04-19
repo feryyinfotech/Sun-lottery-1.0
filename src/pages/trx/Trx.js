@@ -1,9 +1,11 @@
 import { Box, Container, Dialog, Stack, Typography } from "@mui/material";
 import axios from "axios";
+import CryptoJS from "crypto-js";
 import * as React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery } from "react-query";
+import { useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad } from "../../Shared/color";
@@ -13,19 +15,24 @@ import Timeactive from "../../assets/images/fast-time (1).png";
 import Timeinactive from "../../assets/images/fast-time.png";
 import Layout from "../../component/Layout/Layout";
 import { endpoint } from "../../services/urls";
-import WinOneMin from "./component/WinOneMin/WinOneMin";
-import WinLossPopup from "./component/WinOneMin/WinLossPopup";
-import { useSelector } from "react-redux";
-import WinThreeMin from "./component/WinOneMin/WinThreeMin";
 import WinFiveMin from "./component/WinOneMin/WinFiveMin";
-import { MyHistoryFn } from "../../services/apicalling";
-import CryptoJS from 'crypto-js'
+import WinLossPopup from "./component/WinOneMin/WinLossPopup";
+import WinOneMin from "./component/WinOneMin/WinOneMin";
+import WinThreeMin from "./component/WinOneMin/WinThreeMin";
 function Win() {
   const navigate = useNavigate();
-  const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
-  const user_id =login_data && JSON.parse(login_data)?.UserID;
+  const login_data =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null;
+  const user_id = login_data && JSON.parse(login_data)?.UserID;
   const [Tab, setTab] = useState(1);
-
+  const [opendialogbox, setOpenDialogBox] = useState(false);
+  const isAppliedbet = localStorage.getItem("betApplied");
+  const dummycounter = useSelector((state) => state.aviator.dummycounter);
 
   const walletamount = async () => {
     try {
@@ -38,13 +45,6 @@ function Win() {
       console.log(e);
     }
   };
- 
-
-  const [opendialogbox, setOpenDialogBox] = useState(false);
-  const isAppliedbet = localStorage.getItem("betApplied");
-  const dummycounter = useSelector((state) => state.aviator.dummycounter);
-
-  const client = useQueryClient();
 
   const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
     refetchOnMount: false,
@@ -151,7 +151,7 @@ function Win() {
                 <Box component="img" src={Timeactive} width={50}></Box>
               )}
               <Typography variant="h3" color="initial">
-               TRX 1Min
+                TRX 1Min
               </Typography>
             </Box>
             <Box
@@ -165,7 +165,7 @@ function Win() {
                 <Box component="img" src={Timeactive} width={50}></Box>
               )}
               <Typography variant="h3" color="initial">
-              TRX 3Min
+                TRX 3Min
               </Typography>
             </Box>
             <Box
@@ -179,7 +179,7 @@ function Win() {
                 <Box component="img" src={Timeactive} width={50}></Box>
               )}
               <Typography variant="h3" color="initial">
-              TRX 5Min
+                TRX 5Min
               </Typography>
             </Box>
           </Stack>
@@ -187,7 +187,7 @@ function Win() {
         {Tab === 1 && <WinOneMin gid="1" />}
         {Tab === 2 && <WinThreeMin gid="2" />}
         {Tab === 3 && <WinFiveMin gid="3" />}
-          {/* opendialogbox */}
+        {/* opendialogbox */}
         {opendialogbox && (
           <Dialog
             open={opendialogbox}
@@ -198,7 +198,7 @@ function Win() {
               },
             }}
           >
-            <WinLossPopup gid={isAppliedbet?.split("_")?.[0]}/>
+            <WinLossPopup gid={isAppliedbet?.split("_")?.[0]} />
           </Dialog>
         )}
         <CustomCircularProgress isLoading={isLoading} />

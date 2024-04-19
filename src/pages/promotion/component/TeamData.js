@@ -11,6 +11,8 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { rupees } from "../../../services/urls";
+import { Star } from "@mui/icons-material";
 function TeamData() {
   const { isLoading, data } = useQuery(
     ["promotion_data"],
@@ -22,6 +24,7 @@ function TeamData() {
   );
 
   const result = data?.data?.data?.teamMembersByLevel;
+  const all_data = data?.data?.data;
 
   return (
     <Layout>
@@ -48,12 +51,37 @@ function TeamData() {
         {
           <Accordion className="!rounded-lg">
             <AccordionSummary
+              expandIcon={<Star className="!text-white" />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+              sx={{ background: "#4737BD", color: "white" }}
+            >
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Levels</span>
+                <p className="!text-center">Members</p>
+                <p className="!text-center">Deposit Amount</p>
+              </div>
+            </AccordionSummary>
+          </Accordion>
+        }
+        {
+          <Accordion className="!rounded-lg">
+            <AccordionSummary
               expandIcon={<ArrowDownwardIcon className="!text-white" />}
               aria-controls="panel1-content"
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 1
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 1</span>
+                <p className="!text-center">{result?.level_1?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[0] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -90,7 +118,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 2
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 2</span>
+                <p className="!text-center">{result?.level_2?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[1] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -125,7 +162,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 3
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 3</span>
+                <p className="!text-center">{result?.level_3?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[2] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -160,7 +206,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 4
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 4</span>
+                <p className="!text-center">{result?.level_4?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[3] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -195,7 +250,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 5
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 5</span>
+                <p className="!text-center">{result?.level_5?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[4] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -230,7 +294,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 6
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 6</span>
+                <p className="!text-center">{result?.level_6?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[5] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -265,7 +338,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 7
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 7</span>
+                <p className="!text-center">{result?.level_7?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[6] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -300,7 +382,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 8
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 8</span>
+                <p className="!text-center">{result?.level_8?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[7] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -335,7 +426,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 9
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 9</span>
+                <p className="!text-center">{result?.level_9?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[8] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -370,7 +470,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 10
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 10</span>
+                <p className="!text-center">{result?.level_10?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[9] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -405,7 +514,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 11
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 11</span>
+                <p className="!text-center">{result?.level_11?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[10] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -440,7 +558,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 12
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 12</span>
+                <p className="!text-center">{result?.level_12?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[11] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -475,7 +602,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 13
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 13</span>
+                <p className="!text-center">{result?.level_13?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[12] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -510,7 +646,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 14
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 14</span>
+                <p className="!text-center">{result?.level_14?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[13] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -545,7 +690,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 15
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 15</span>
+                <p className="!text-center">{result?.level_15?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[14] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -580,7 +734,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 16
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 16</span>
+                <p className="!text-center">{result?.level_16?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[15] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -615,7 +778,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 17
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 17</span>
+                <p className="!text-center">{result?.level_17?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[16] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -650,7 +822,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 18
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 18</span>
+                <p className="!text-center">{result?.level_18?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[17] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -685,7 +866,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 19
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 19</span>
+                <p className="!text-center">{result?.level_19?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[18] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>
@@ -720,7 +910,16 @@ function TeamData() {
               id="panel1-header"
               sx={{ background: "#4737BD", color: "white" }}
             >
-              Level 20
+              <div className="w-full grid grid-cols-3 pr-2">
+                <span className="!text-center">Level: 20</span>
+                <p className="!text-center">{result?.level_20?.length || 0}</p>
+                <p className="!text-center">
+                  {rupees}{" "}
+                  <span className="text-green-200">
+                    {all_data?.deposit_member_amount?.[19] || 0}
+                  </span>{" "}
+                </p>
+              </div>
             </AccordionSummary>
             <AccordionDetails sx={{ background: zubgback, color: "white" }}>
               <Box sx={{ paddingTop: 2 }}>

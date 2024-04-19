@@ -1,4 +1,5 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { useFormik } from "formik";
 import * as React from "react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -18,9 +19,6 @@ import Chart from "./Chart";
 import GameHistory from "./GameHistory";
 import MyHistory from "./MyHistory";
 import OneMinCountDown from "./OneMinCountDown";
-import ThreeMinCountDown from "./ThreeMinCountDown";
-import TwoMinCountDown from "./TwoMinCountDown";
-import { useFormik } from "formik";
 
 function WinOneMin({ gid }) {
   const [TabTwo, setTabTwo] = useState(1);

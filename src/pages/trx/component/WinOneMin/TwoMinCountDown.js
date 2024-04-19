@@ -2,52 +2,36 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
-import axios from "axios";
 import * as React from "react";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../../../Shared/SocketContext";
 import countdownfirst from "../../../../assets/countdownfirst.mp3";
 import countdownlast from "../../../../assets/countdownlast.mp3";
-import pr0 from "../../../../assets/images/0.png";
-import pr11 from "../../../../assets/images/11.png";
-import pr22 from "../../../../assets/images/22.png";
-import pr33 from "../../../../assets/images/33.png";
-import pr4 from "../../../../assets/images/4.png";
-import pr5 from "../../../../assets/images/5.png";
-import pr6 from "../../../../assets/images/6.png";
-import pr7 from "../../../../assets/images/7.png";
-import pr8 from "../../../../assets/images/8.png";
-import pr9 from "../../../../assets/images/9.png";
 import circle from "../../../../assets/images/circle-arrow.png";
 import howToPlay from "../../../../assets/images/user-guide.png";
-import { dummycounterFun } from "../../../../redux/slices/counterSlice";
-import { changeImages } from "../../../../services/schedular";
-import { endpoint } from "../../../../services/urls";
+import trxtimerbackground from "../../../../assets/trxtimerbackground.png";
 import Policy from "../policy/Policy";
+import ShowImages from "./ShowImages";
+import {
+  dummycounterFun,
+  trx_game_image_index_function,
+  updateNextCounter,
+} from "../../../../redux/slices/counterSlice";
+import axios from "axios";
+import { endpoint } from "../../../../services/urls";
+import toast from "react-hot-toast";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 const TwoMinCountDown = ({ fk }) => {
   const socket = useSocket();
-  const dispatch = useDispatch();
   const client = useQueryClient();
   const [three_min_time, setThree_min_time] = useState("0_0");
-  const [isImageChange, setIsImageChange] = useState("1_2_3_4_5");
   const [poicy, setpoicy] = React.useState(false);
+  const dispatch = useDispatch();
 
-  const img1 = Number(isImageChange?.split("_")[0]);
-  const img2 = Number(isImageChange?.split("_")[1]);
-  const img3 = Number(isImageChange?.split("_")[2]);
-  const img4 = Number(isImageChange?.split("_")[3]);
-  const img5 = Number(isImageChange?.split("_")[4]);
-  const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
-
-  React.useEffect(() => {
-    setIsImageChange(changeImages());
-  }, []);
   const next_step = useSelector((state) => state.aviator.next_step);
 
   const show_this_three_min_time_sec = React.useMemo(
@@ -104,21 +88,64 @@ const TwoMinCountDown = ({ fk }) => {
         threemin?.split("_")?.[1] === "0" &&
         threemin?.split("_")?.[0] === "0"
       ) {
-        // client.refetchQueries("gamehistory");
-        // client.refetchQueries("gamehistory_chart");
-        // client.refetchQueries("myhistory");
-        // client.refetchQueries("myAllhistory");
-        // dispatch(dummycounterFun());
+        client.refetchQueries("trx_gamehistory");
+        client.refetchQueries("trx_gamehistory_chart");
+        client.refetchQueries("my_trx_Allhistory");
+        client.refetchQueries("my_trx_history");
+        client.refetchQueries("walletamount");
+        dispatch(dummycounterFun());
+        // fk.setFieldValue("openTimerDialogBoxOneMin", false);
       }
     };
 
-    socket.on("threemin", handleThreeMin);
+    socket.on("threemintrx", handleThreeMin);
 
     return () => {
-      socket.off("threemin", handleThreeMin);
+      socket.off("threemintrx", handleThreeMin);
     };
   }, []);
 
+  const { isLoading, data: game_history } = useQuery(
+    ["trx_gamehistory"],
+    () => GameHistoryFn(),
+    {
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+    }
+  );
+
+  const GameHistoryFn = async () => {
+    try {
+      const response = await axios.get(
+        `${endpoint.trx_game_history}?gameid=2&limit=500`
+      );
+      return response;
+    } catch (e) {
+      toast(e?.message);
+      console.log(e);
+    }
+  };
+
+  React.useEffect(() => {
+    dispatch(
+      updateNextCounter(
+        game_history?.data?.result
+          ? Number(game_history?.data?.result?.[0]?.tr_transaction_id) + 1
+          : 1
+      )
+    );
+    const tr_digit =
+      game_history?.data?.result && game_history?.data?.result?.[0]?.tr_digits;
+    let array = [];
+    for (let i = 0; i < tr_digit?.length; i++) {
+      if (/[a-zA-Z]/.test(tr_digit[i])) {
+        array.push(tr_digit[i].toUpperCase());
+      } else {
+        array.push(tr_digit[i]);
+      }
+    }
+    dispatch(trx_game_image_index_function(array));
+  }, [game_history?.data?.result]);
 
   const audioRefMusic = React.useRef(null);
   const handlePlaySound = async () => {
@@ -148,7 +175,10 @@ const TwoMinCountDown = ({ fk }) => {
   };
 
   return (
-    <Box className="countdownbg">
+    <Box
+      className="countdownbgtrx"
+      sx={{ backgroundImage: `url(${trxtimerbackground})` }}
+    >
       {React.useMemo(() => {
         return (
           <>
@@ -178,21 +208,30 @@ const TwoMinCountDown = ({ fk }) => {
         >
           {React.useMemo(() => {
             return (
-              <Box onClick={() => handleClickOpenpoicy()}>
-                <Box
-                  component="img"
-                  src={howToPlay}
-                  sx={{ width: "25px !important", height: "25px !important" }}
-                ></Box>
-                <Typography variant="body1" color="initial">
-                  How to play
+              <>
+                <Box onClick={() => handleClickOpenpoicy()}>
+                  <Box
+                    component="img"
+                    src={howToPlay}
+                    sx={{ width: "25px !important", height: "25px !important" }}
+                  ></Box>
+                  <Typography variant="body1" color="initial">
+                    How to play
+                  </Typography>
+                  <Box
+                    component="img"
+                    src={circle}
+                    sx={{ width: "15px !important", height: "15px !important" }}
+                  ></Box>
+                </Box>
+                <Typography
+                  variant="body1"
+                  color="initial"
+                  className="!ml-2 !text-lg"
+                >
+                  TRX 3 Min
                 </Typography>
-                <Box
-                  component="img"
-                  src={circle}
-                  sx={{ width: "15px !important", height: "15px !important" }}
-                ></Box>
-              </Box>
+              </>
             );
           }, [])}
           {poicy && (
@@ -217,26 +256,6 @@ const TwoMinCountDown = ({ fk }) => {
               <Policy />
             </Dialog>
           )}
-          {React.useMemo(() => {
-            return (
-              <>
-                <Typography variant="body1" color="initial">
-                  Win Go 1Min
-                </Typography>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Box component="img" src={image_array[Number(img1)]}></Box>
-                  <Box component="img" src={image_array[Number(img2)]}></Box>
-                  <Box component="img" src={image_array[Number(img3)]}></Box>
-                  <Box component="img" src={image_array[Number(img4)]}></Box>
-                  <Box component="img" src={image_array[Number(img5)]}></Box>
-                </Stack>
-              </>
-            );
-          }, [img1, img2, img3, img4, img5])}
         </Box>
         <Box>
           <Typography variant="h3" color="initial" className="winTextone">
@@ -274,6 +293,9 @@ const TwoMinCountDown = ({ fk }) => {
           </Typography>
         </Box>
       </Box>
+      {React.useMemo(() => {
+        return <ShowImages />;
+      }, [])}
       {/* {fk.values.openTimerDialogBox && (
         <Dialog
           open={fk.values.openTimerDialogBox}

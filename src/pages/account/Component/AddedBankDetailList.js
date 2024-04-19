@@ -1,30 +1,30 @@
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Add, Edit } from "@mui/icons-material";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import {
   Box,
-  Button,
   Container,
   Divider,
   IconButton,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
 import * as React from "react";
+import { useQuery, useQueryClient } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
 import deposit from "../../../assets/images/history.png";
 import Layout from "../../../component/Layout/Layout";
-import { Add, Edit } from "@mui/icons-material";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import { useQuery } from "react-query";
 import { BankListDetails } from "../../../services/apicalling";
 function AddedBankDetailList() {
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
   };
-
+  const client = useQueryClient();
+  React.useEffect(() => {
+    client?.refetchQueries("bank_list_details");
+  }, []);
   const { isLoading, data } = useQuery(
     ["bank_list_details"],
     () => BankListDetails(),
@@ -35,8 +35,7 @@ function AddedBankDetailList() {
   );
   const result = React.useMemo(() => data?.data?.data, [data]);
 
-  console.log(result,"this is result");
-
+  console.log(result, "this is result");
 
   return (
     <Layout>

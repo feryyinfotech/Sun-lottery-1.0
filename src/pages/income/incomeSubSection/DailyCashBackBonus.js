@@ -11,6 +11,7 @@ import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
 import Layout from "../../../component/Layout/Layout";
 import {
+  dailyWalletIncomeFn,
     registrationBonusFn
 } from "../../../services/apicalling";
 import nodatafoundimage from "../../../assets/images/nodatafoundimage.png";
@@ -22,14 +23,14 @@ function DailyCashBackBonus() {
 
   const { isLoading, data } = useQuery(
     ["dailycashback_bonus"],
-    () => registrationBonusFn(),
+    () => dailyWalletIncomeFn(),
     {
       refetchOnMount: false,
       refetchOnReconnect: true,
     }
   );
   const res = data?.data?.data;
-  if (!res)
+  if (!isLoading && !res)
     return (
       <Layout>
         <Container

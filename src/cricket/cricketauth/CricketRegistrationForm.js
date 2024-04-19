@@ -1,23 +1,24 @@
 import CopyAllIcon from "@mui/icons-material/CopyAll";
-import { Box, Container, Dialog, Typography } from "@mui/material";
-import axios from "axios";
-import { Button } from "@mui/material";
+import { Box, Button, Container, Dialog, Typography } from "@mui/material";
 import copy from "clipboard-copy";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
 import { signupSchemaValidataon } from "../../Shared/Validation";
 import logo from "../../assets/images/club-8-copyright.png";
-import poster from "../../assets/images/poster6.jpg";
-import { endpoint } from "../../services/urls";
+import { Cricket_id_passFunction } from "../../services/apicalling";
 function CricketRegistrationForm() {
   const navigate = useNavigate();
   const [openDialogBox, setOpenDialogBox] = useState(false);
   const [id_pass, set_id_pass] = useState(" _ ");
   const [loding, setloding] = useState(false);
-
+  const [id_pass_data, setId_pass_data] = useState({
+    id: "",
+    pass: "",
+    url: "",
+  });
   const functionTOCopy = (value) => {
     copy(value);
     toast.success("Copied to clipboard!");
@@ -52,39 +53,16 @@ function CricketRegistrationForm() {
     },
   });
 
-  const signupFunction = async (reqbody) => {
-    setloding(true);
-    const fd = new FormData();
-    fd.append("email", reqbody.email);
-    fd.append("mobile", reqbody.mobile);
-    fd.append("password", reqbody.password);
-    fd.append("confirmed_password", reqbody.confirmed_password);
-    fd.append("referral_code", reqbody.referral_code);
+  useEffect(() => {
+    Cricket_id_passFunction({ setId_pass_data });
+  }, []);
 
-    try {
-      const response = await axios.post(endpoint.signup, fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "Access-Control-Allow-Origin": "*",
-          // Add any other headers you may need, such as authorization
-        },
-      });
-
-      toast.success(response?.data?.msg);
-      if (response?.data?.status === "200") {
-        navigate("/");
-      }
-    } catch (e) {
-      toast.error(e?.message);
-      console.error(e);
-    }
-    setloding(false);
-  };
   return (
     <Container
       sx={{
-        backgroundImage: `url(${poster})`,
         backgroundRepeat: "no-repeat",
+        // backgroundImage: `url(${poster})`,
+        backgroundImage: `url('https://www.mordeo.org/download/25792/')`,
         backgroundSize: "100% 100%",
         minHeight: "100vh",
       }}
@@ -223,151 +201,22 @@ function CricketRegistrationForm() {
                 </div>
               </Box>
               <div className="!flex !justify-center !mt-5">
-              <Button
-                to="/cricket/registration"
-                className="playnow !cursor-pointer !bg-[#00B55E]"
-                role="Button"
-                // sx={style.button}
-              >
-                Open Now
-              </Button>
-              </div>
-              {/* <Box mt={2}>
-                <FormControl fullWidth>
-                  <Stack direction="row" className="loginlabel">
-                    <Typography variant="h3">Mobile</Typography>
-                  </Stack>
-                  <TextField
-                    id="fullWidth"
-                    placeholder="Enter Mobile Number"
-                    className="loginfields"
-                    name="mobile"
-                    type="number"
-                    value={fk.values.mobile}
-                    onChange={fk.handleChange}
-                    onKeyDown={(e) => e.key === "Enter" && fk.handleSubmit()}
-                  />
-                  {fk.touched.mobile && fk.errors.mobile && (
-                    <div className="error">{fk.errors.mobile}</div>
-                  )}
-                </FormControl>
-              </Box>
-              <Box mt={2}>
-                <FormControl fullWidth>
-                  <Stack direction="row" className="loginlabel">
-                    <Typography variant="h3">E-mail</Typography>
-                  </Stack>
-                  <TextField
-                    id="fullWidth"
-                    type="email"
-                    placeholder="Enter email"
-                    className="loginfields"
-                    name="email"
-                    value={fk.values.email}
-                    onChange={fk.handleChange}
-                    onKeyDown={(e) => e.key === "Enter" && fk.handleSubmit()}
-                  />
-                  {fk.touched.email && fk.errors.email && (
-                    <div className="error">{fk.errors.email}</div>
-                  )}
-                </FormControl>
-              </Box>
-              <Box mt={2}>
-                <FormControl fullWidth>
-                  <Stack direction="row" className="loginlabel">
-                    <Typography variant="h3">Set password</Typography>
-                  </Stack>
-                  <OutlinedInput
-                    placeholder="Enter password"
-                    name="password"
-                    value={fk.values.password}
-                    onChange={fk.handleChange}
-                    onKeyDown={(e) => e.key === "Enter" && fk.handleSubmit()}
-                    className="loginfieldspass"
-                    type={showPassword ? "text" : "password"}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? (
-                            <VisibilityOff sx={{ color: zubgbackgrad }} />
-                          ) : (
-                            <Visibility sx={{ color: zubgbackgrad }} />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                  {fk.touched.password && fk.errors.password && (
-                    <div className="error">{fk.errors.password}</div>
-                  )}
-                </FormControl>
-              </Box>
-              <Box mt={2}>
-                <FormControl fullWidth>
-                  <Stack direction="row" className="loginlabel">
-                    <Typography variant="h3">Confirm password</Typography>
-                  </Stack>
-                  <OutlinedInput
-                    className="loginfieldspass"
-                    name="confirmed_password"
-                    value={fk.values.confirmed_password}
-                    onChange={fk.handleChange}
-                    onKeyDown={(e) => e.key === "Enter" && fk.handleSubmit()}
-                    placeholder="Enter confirm password"
-                    type={show_confirm_password ? "text" : "password"}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handle_confirm_ClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {show_confirm_password ? (
-                            <VisibilityOff sx={{ color: zubgbackgrad }} />
-                          ) : (
-                            <Visibility sx={{ color: zubgbackgrad }} />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                </FormControl>
-              </Box>
-              <Box mt={1}>
-                <FormControl fullWidth>
-                  <FormControlLabel
-                    required
-                    control={
-                      <Checkbox
-                        checked={fk.values.privacy_policy}
-                        sx={{ color: "black !important" }}
-                        onClick={() =>
-                          fk.setFieldValue(
-                            "privacy_policy",
-                            !fk.values.privacy_policy
-                          )
-                        }
-                      />
-                    }
-                    label="I have read and agree 【Privacy Agreement】"
-                    sx={{ color: "white" }}
-                  />
-                </FormControl>
-              </Box>
-              <Stack direction="row" className="loginbtnbox" mt={2}>
                 <Button
-                  component={NavLink}
-                  className="btnLogin"
+                  to="/cricket/registration"
+                  className="playnow !cursor-pointer !bg-[#00B55E]"
+                  role="Button"
+                  onClick={() => {
+                    if (!id_pass_data?.id || !id_pass_data?.pass)
+                      return toast("Data not found");
+                    else {
+                      set_id_pass(`${id_pass_data?.id}_${id_pass_data?.pass}`);
+                      setOpenDialogBox(true);
+                    }
+                  }}
                 >
-                  Submit
+                  Open Now
                 </Button>
-              </Stack> */}
+              </div>
             </Box>
           </Box>
         </Box>
@@ -377,6 +226,7 @@ function CricketRegistrationForm() {
           <Box mt={3} className="!text-black !p-5 lg:!w-[20vw] !w-[100%]">
             <p className="!text-black">Service Provider:</p>
             <div className="grid grid-cols-2 !border-2 !border-black !p-1">
+              {/* show id */}
               <p className="!text-black  !border-r !border-b !border-black">
                 ID
               </p>
@@ -386,6 +236,7 @@ function CricketRegistrationForm() {
                   onClick={() => functionTOCopy(id_pass?.split("_")?.[0])}
                 />
               </p>
+              {/* password */}
               <p className="!text-black  !border-r !border-b !border-black">
                 Password
               </p>
@@ -395,6 +246,22 @@ function CricketRegistrationForm() {
                   onClick={() => functionTOCopy(id_pass?.split("_")?.[1])}
                 />
               </p>
+              {/* url */}
+              {id_pass_data?.id && id_pass_data?.pass && (
+                <>
+                  <p className="!text-black  !border-r !border-b !border-black">
+                    URL
+                  </p>
+                  <a
+                    href={id_pass_data?.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="!text-blue-900 !cursor-pointer !border-b !border-black !text-center flex w-full justify-between px-1"
+                  >
+                    <span>Click here to open link</span>{" "}
+                  </a>
+                </>
+              )}
             </div>
           </Box>
         </Dialog>

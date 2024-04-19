@@ -1,7 +1,7 @@
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import {
-    Box,
-    Container
+  Box,
+  Container
 } from "@mui/material";
 import moment from "moment";
 import * as React from "react";
@@ -9,11 +9,11 @@ import { useQuery } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
+import nodatafoundimage from "../../../assets/images/nodatafoundimage.png";
 import Layout from "../../../component/Layout/Layout";
 import {
-    registrationBonusFn
+  team_trading_bonus_functoin
 } from "../../../services/apicalling";
-import nodatafoundimage from "../../../assets/images/nodatafoundimage.png";
 
 function TeamTradingBonus() {
   const navigate = useNavigate();
@@ -23,14 +23,14 @@ function TeamTradingBonus() {
 
   const { isLoading, data } = useQuery(
     ["team_trading_bonus"],
-    () => registrationBonusFn(),
+    () => team_trading_bonus_functoin(),
     {
       refetchOnMount: false,
       refetchOnReconnect: true,
     }
   );
   const res = data?.data?.data;
-  if (!res)
+  if (!isLoading && !res)
   return (
     <Layout>
       <Container

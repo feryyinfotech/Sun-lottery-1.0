@@ -7,7 +7,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
 import Layout from "../../../component/Layout/Layout";
-import { registrationBonusFn } from "../../../services/apicalling";
+import { registrationBonusFn, teamRewartBonus } from "../../../services/apicalling";
 import nodatafoundimage from "../../../assets/images/nodatafoundimage.png";
 
 function TeamRewardBonus() {
@@ -18,7 +18,7 @@ function TeamRewardBonus() {
 
   const { isLoading, data } = useQuery(
     ["team_reward_bonus"],
-    () => registrationBonusFn(),
+    () => teamRewartBonus(),
     {
       refetchOnMount: false,
       refetchOnReconnect: true,
@@ -26,7 +26,7 @@ function TeamRewardBonus() {
   );
   const res = data?.data?.data;
 
-  if (!res)
+  if (!isLoading && !res)
   return (
     <Layout>
       <Container

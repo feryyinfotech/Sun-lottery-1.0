@@ -17,7 +17,6 @@ import { useFormik } from "formik";
 import moment from "moment";
 import * as React from "react";
 import toast from "react-hot-toast";
-import { useQueryClient } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { cashDepositRequestValidationSchema } from "../../../Shared/Validation";
@@ -39,7 +38,6 @@ import CryptoJS from "crypto-js";
 function WalletRecharge() {
   const [t_id, setT_id] = React.useState();
   const [callBackResponse, setCallBackResponse] = React.useState({payment_status:"NO"});
-  // console.log(uuid.v4(), "This is response");
   let intervalId;
   const dispatch = useDispatch();
   const aviator_login_data = useSelector(
@@ -171,7 +169,7 @@ function WalletRecharge() {
     try {
       const res = await axios.post(`${endpoint.payment_request}`, fdata);
       const qr_url = JSON.parse(res?.data?.data) || "";
-
+  //  console.log(qr_url,"This is final qr code response");
       if (qr_url) {
         setDeposit_req_data(qr_url);
       } else {

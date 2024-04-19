@@ -15,17 +15,16 @@ import Dialog from "@mui/material/Dialog";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
+import CryptoJS from "crypto-js";
 import * as React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useQuery, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
+import { useDispatch, useSelector } from "react-redux";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
+import { get_user_data_fn } from "../../../services/apicalling";
 import { endpoint } from "../../../services/urls";
 import Policy from "./policy/Policy";
-import { MyHistoryFn, get_user_data_fn } from "../../../services/apicalling";
-import { useDispatch, useSelector } from "react-redux";
-import { pendingIdsFunction } from "../../../redux/slices/counterSlice";
-import CryptoJS from "crypto-js";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -39,6 +38,7 @@ const ApplyBetDialogBox = ({
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
+  const next_step = useSelector((state) => state.aviator.next_step);
   const client = useQueryClient();
   const login_data =
     (localStorage.getItem("logindataen") &&
@@ -88,9 +88,10 @@ const ApplyBetDialogBox = ({
         (type === "small" && 50) ||
         type,
       gameid: Number(gid),
+      gamesnio: Number(next_step),
     };
     try {
-      const response = await axios.post(`${endpoint.applybet}`, reqBody);
+      const response = await axios.post(`${endpoint.trx_game_bet}`, reqBody);
       if (response?.data?.error === "200") {
         toast.success(response?.data?.msg);
         setapply_bit_dialog_box(false);
@@ -102,8 +103,10 @@ const ApplyBetDialogBox = ({
       toast(e?.message);
       console.log(e);
     }
+    client.refetchQueries("my_trx_Allhistory");
     client.refetchQueries("walletamount");
-    client.refetchQueries("myhistory");
+    client.refetchQueries("trx_gamehistory");
+    client.refetchQueries("my_trx_history");
     setLoding(false);
   }
 
@@ -286,11 +289,11 @@ const ApplyBetDialogBox = ({
           className="!text-white"
           variant="text"
           color="primary"
-          // onClick={() => {
-          //   Number(first_rechange) === 1
-          //     ? betFunctionStart()
-          //     : toast("You must be sure that , your first deposit is done.");
-          // }}
+          onClick={() => {
+            Number(first_rechange) === 1
+              ? betFunctionStart()
+              : toast("You must be sure that , your first deposit is done.");
+          }}
           loding={true}
         >
           Confirm

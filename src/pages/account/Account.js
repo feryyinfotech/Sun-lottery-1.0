@@ -1,7 +1,16 @@
 import CachedIcon from "@mui/icons-material/Cached";
+import CloseIcon from "@mui/icons-material/Close";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  Button,
+  Container,
+  Dialog,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
@@ -27,11 +36,14 @@ import balance from "../../assets/images/send.png";
 import setting from "../../assets/images/settings (1).png";
 import trans from "../../assets/images/translation.png";
 import s from "../../assets/images/wallet.png";
+import sunlotteryhomebanner from "../../assets/sunlotteryhomebanner.jpg";
 import Layout from "../../component/Layout/Layout";
 import { MyProfileDataFn } from "../../services/apicalling";
 function Account() {
   const navigate = useNavigate();
   const profile_data = localStorage.getItem("profile_data");
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(true);
+
   const [imageNumber, setImageNumber] = useState(profile_data || "1");
   const { isLoading, data } = useQuery(["myprofile"], () => MyProfileDataFn(), {
     refetchOnMount: false,
@@ -46,6 +58,7 @@ function Account() {
     { id: 4, img: dp4 },
   ];
 
+  useEffect(() => {}, []);
 
   return (
     <Layout>
@@ -110,21 +123,13 @@ function Account() {
               Wallet
             </Typography>
           </Box>
-          <Box
-            sx={style.actionBox}
-            component={NavLink}
-            to="/wallet/Recharge"
-          >
+          <Box sx={style.actionBox} component={NavLink} to="/wallet/Recharge">
             <Box component="img" src={dpt} sx={style.actionImage} />
             <Typography variant="body1" color="initial" sx={style.actionText}>
               Deposit
             </Typography>
           </Box>
-          <Box
-            sx={style.actionBox}
-            component={NavLink}
-            to="/Withdrawal"
-          >
+          <Box sx={style.actionBox} component={NavLink} to="/Withdrawal">
             <Box component="img" src={wtd} sx={style.actionImage} />
             <Typography variant="body1" color="initial" sx={style.actionText}>
               Withdraw
@@ -449,6 +454,20 @@ function Account() {
             Logout
           </Button>
         </Box>
+        {openDialogBoxHomeBanner && (
+          <Dialog PaperProps={{width:"500px",height:"500px"}} open={openDialogBoxHomeBanner}>
+            <div>
+              <p>
+                <IconButton onClick={() => setopenDialogBoxHomeBanner(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </p>
+              <p>
+                <img  src={sunlotteryhomebanner} />
+              </p>
+            </div>
+          </Dialog>
+        )}
         <CustomCircularProgress isLoading={isLoading} />
       </Container>
     </Layout>

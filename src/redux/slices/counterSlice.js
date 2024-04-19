@@ -12,7 +12,7 @@ export const slice = createSlice({
     byTimeEnablingSound: false,
     backgroundImage_url:
       localStorage.getItem("bg_image") ||
-      "https://res.cloudinary.com/do7kimovl/image/upload/v1708942319/cloud5_kwar8w.jpg",
+      "https://res.cloudinary.com/do7kimovl/image/upload/v1709114502/circle_dafpdo.svg",
     backgroundMusic_url:
       localStorage.getItem("bg_music") ||
       "https://res.cloudinary.com/do7kimovl/video/upload/v1709029785/bg_music_iiovsn.mp3",
@@ -22,7 +22,9 @@ export const slice = createSlice({
     dummycounter:1,
     next_step:1,
     pendingIds:[],
-    aviator_login_data:null
+    aviator_login_data:null,
+    trx_game_image_index:["A","B","C","D","E"]
+
   },
   reducers: {
     // main music and sound enabling and dessabling
@@ -68,6 +70,9 @@ export const slice = createSlice({
     aviator_login_data_fn: (state,actions) => {
       state.aviator_login_data = actions.payload;
     },
+    trx_game_image_index_function: (state,actions) => {
+      state.trx_game_image_index = actions.payload;
+    },
   },
 });
 
@@ -84,7 +89,8 @@ export const {
   dummycounterFun,
   updateNextCounter,
   pendingIdsFunction,
-  aviator_login_data_fn
+  aviator_login_data_fn,
+  trx_game_image_index_function
 } = slice.actions;
 
 // export const incrementAsync = amount => dispatch => {

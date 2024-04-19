@@ -1,13 +1,12 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
-import { Box, Button, Container, FormControl, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography } from '@mui/material';
 import * as React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { zubgback, zubgbackgrad, zubgmid } from '../../../Shared/color';
+import english from '../../../assets/images/enflag.png';
+import india from '../../../assets/images/inflag.webp';
 import Layout from '../../../component/Layout/Layout';
-import india from '../../../assets/images/inflag.webp'
-import english from '../../../assets/images/enflag.png'
-import { rupees } from '../../../services/urls';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 
 function Languages() {

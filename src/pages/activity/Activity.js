@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Dialog, IconButton, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -12,9 +12,14 @@ import ludosix from "../../assets/images/lodu6.webp";
 import ludo from "../../assets/images/ludo.webp";
 import Layout from "../../component/Layout/Layout";
 import toast from "react-hot-toast";
+import CloseIcon from "@mui/icons-material/Close";
+import sunlotteryhomebanner from "../../assets/sunlotteryhomebanner.jpg";
+import { useState } from "react";
 
 function Activity() {
   const navigate = useNavigate();
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(true);
+
   const goBack = () => {
     navigate(-1);
   };
@@ -109,6 +114,20 @@ function Activity() {
             );
           })}
         </Box>
+        {openDialogBoxHomeBanner && (
+          <Dialog PaperProps={{width:"500px",height:"500px"}} open={openDialogBoxHomeBanner}>
+            <div>
+              <p>
+                <IconButton onClick={() => setopenDialogBoxHomeBanner(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </p>
+              <p>
+                <img  src={sunlotteryhomebanner} />
+              </p>
+            </div>
+          </Dialog>
+        )}
       </Container>
     </Layout>
   );

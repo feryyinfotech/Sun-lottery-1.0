@@ -1,4 +1,3 @@
-import CachedIcon from "@mui/icons-material/Cached";
 import HistoryIcon from "@mui/icons-material/History";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import {
@@ -10,48 +9,30 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
+import CryptoJS from 'crypto-js';
+import { useFormik } from "formik";
 import * as React from "react";
+import toast from "react-hot-toast";
+import { useQueryClient } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
+import { withdrawAmountSchemaValidaton } from "../../../Shared/Validation";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
 import cip from "../../../assets/cip.png";
 import payment from "../../../assets/images/payment (1).png";
-import balance from "../../../assets/images/send.png";
 import playgame from "../../../assets/images/playgame.jpg";
-import { useFormik } from "formik";
-import { endpoint } from "../../../services/urls";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { withdrawAmountSchemaValidaton } from "../../../Shared/Validation";
 import Layout from "../../../component/Layout/Layout";
-import CryptoJS from 'crypto-js'
+import { endpoint } from "../../../services/urls";
 function AddBankDetails() {
   const login_data = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null
   const user_id = login_data &&  JSON.parse(login_data)?.UserID;
-  const [amount, setAmount] = React.useState({ wallet: 0, winning: 0 });
-
+ const client = useQueryClient()
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
   };
 
 
-  const walletamountFn = async () => {
-    try {
-      const response = await axios.get(
-        `${endpoint.userwallet}?userid=${user_id}`
-      );
-
-      setAmount(response?.data?.data);
-      // console.log(response,"response")
-    } catch (e) {
-      toast(e?.message);
-      console.log(e);
-    }
-  };
-
-  React.useEffect(() => {
-    walletamountFn();
-  }, []);
 
   const initialValues = {
     email: "",
@@ -90,6 +71,7 @@ function AddBankDetails() {
     try {
       const response = await axios.post(`${endpoint.add_bank_details}`,fd);
       toast(response?.data?.msg)
+      client.refetchQueries("bank_list_details");
       if(response?.data?.msg){
         navigate('/add-bank-details/pre-added-bank-details')
       }

@@ -6,10 +6,16 @@ import { routes } from "./routes";
 import Login from "./pages/auth/login/Login";
 import Register from "./pages/auth/register/Register";
 import ForgetPassword from "./pages/auth/login/ForgetPassword";
-import CryptoJS from 'crypto-js'
+import CryptoJS from "crypto-js";
 
 const App = () => {
-  const isAuthenticated = localStorage.getItem("logindataen") && CryptoJS.AES.decrypt(localStorage.getItem("logindataen"), "anand")?.toString(CryptoJS.enc.Utf8) || null // Check if the user is authenticated
+  const isAuthenticated =
+    (localStorage.getItem("logindataen") &&
+      CryptoJS.AES.decrypt(
+        localStorage.getItem("logindataen"),
+        "anand"
+      )?.toString(CryptoJS.enc.Utf8)) ||
+    null; // Check if the user is authenticated
 
   return (
     <Routes>

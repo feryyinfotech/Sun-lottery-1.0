@@ -1,7 +1,7 @@
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import {
-    Box,
-    Container
+  Box,
+  Container
 } from "@mui/material";
 import moment from "moment";
 import * as React from "react";
@@ -9,12 +9,12 @@ import { useQuery } from "react-query";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
+import nodatafoundimage from "../../../assets/images/nodatafoundimage.png";
 import Layout from "../../../component/Layout/Layout";
 import {
-  dailyWalletIncomeFn,
-    registrationBonusFn
+  dailySalaryIncomeFn,
+  dailyWalletIncomeFn
 } from "../../../services/apicalling";
-import nodatafoundimage from "../../../assets/images/nodatafoundimage.png";
 
 function DailySalaryBonus() {
   const navigate = useNavigate();
@@ -23,15 +23,15 @@ function DailySalaryBonus() {
   };
 
   const { isLoading, data } = useQuery(
-    ["dailysalary_bonus"],
-    () => dailyWalletIncomeFn(),
+    ["daily_salary_bonus"],
+    () => dailySalaryIncomeFn(),
     {
       refetchOnMount: false,
       refetchOnReconnect: true,
     }
   );
   const res = data?.data?.data;
-  if (!res)
+  if (!isLoading && !res)
     return (
       <Layout>
         <Container
@@ -47,7 +47,7 @@ function DailySalaryBonus() {
             <Box component={NavLink} onClick={goBack}>
               <KeyboardArrowLeftOutlinedIcon />
             </Box>
-            <p>Daily Cashback Bonus</p>
+            <p>Daily Salary Bonus</p>
           </Box>
           <div>
             <img className="" src={nodatafoundimage} />
