@@ -127,8 +127,6 @@ function Dashboard() {
     top11WinnerFunction();
   }, []);
 
-  console.log(winnner_data, "This is winner data");
-
   const { isLoading, data } = useQuery(["walletamount"], () => walletamount(), {
     refetchOnMount: false,
     refetchOnReconnect: true,

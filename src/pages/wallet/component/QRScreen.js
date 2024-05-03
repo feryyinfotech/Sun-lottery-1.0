@@ -6,8 +6,6 @@ import Layout from "../../../component/Layout/Layout";
 import { rupees } from "../../../services/urls";
 
 const QRScreen = ({ callBackResponse, deposit_req_data, show_time }) => {
-  console.log(callBackResponse, "THis is callback response");
-
   return (
     <Layout footer={false}>
       <Container
@@ -32,7 +30,8 @@ const QRScreen = ({ callBackResponse, deposit_req_data, show_time }) => {
             src="https://i.pinimg.com/originals/e4/af/9f/e4af9f0025a8ce68bee2cf5a1360a501.gif"
           />
 
-          {callBackResponse?.payment_status === "Pending" || callBackResponse?.payment_status === "NO" ? (
+          {callBackResponse?.payment_status === "Pending" ||
+          callBackResponse?.payment_status === "NO" ? (
             <>
               <div className="!bg-white ">
                 <QRCode value={deposit_req_data?.upi_qr_code} />

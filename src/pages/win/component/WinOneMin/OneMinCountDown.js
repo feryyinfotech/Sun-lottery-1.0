@@ -39,11 +39,12 @@ const OneMinCountDown = ({ fk }) => {
   const img3 = Number(isImageChange?.split("_")[2]);
   const img4 = Number(isImageChange?.split("_")[3]);
   const img5 = Number(isImageChange?.split("_")[4]);
+  const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
   const dispatch = useDispatch();
   const audioRefMusic = React.useRef(null);
   const audioRefMusiclast = React.useRef(null);
   const next_step = useSelector((state) => state.aviator.next_step)
-  const image_array = [pr0, pr11, pr22, pr33, pr4, pr5, pr6, pr7, pr8, pr9];
+
   React.useEffect(() => {
     setIsImageChange(changeImages());
   }, []);

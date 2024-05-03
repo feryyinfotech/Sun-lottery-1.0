@@ -37,7 +37,9 @@ import { get_user_data_fn } from "../../../services/apicalling";
 import CryptoJS from "crypto-js";
 function WalletRecharge() {
   const [t_id, setT_id] = React.useState();
-  const [callBackResponse, setCallBackResponse] = React.useState({payment_status:"NO"});
+  const [callBackResponse, setCallBackResponse] = React.useState({
+    payment_status: "NO",
+  });
   let intervalId;
   const dispatch = useDispatch();
   const aviator_login_data = useSelector(
@@ -131,7 +133,8 @@ function WalletRecharge() {
       fd.append("Name", user_name);
       fd.append("TransactionID", transaction_id);
 
-      // getDepositResponse(fd);
+      // return toast("We are upgrading for smooth and fast payin please wait...");
+
       paymentRequest(fd, fk.values.amount);
       fk.setFieldValue("all_data", {
         t_id: fd.get("TransactionID") || "",
@@ -168,8 +171,8 @@ function WalletRecharge() {
     }
     try {
       const res = await axios.post(`${endpoint.payment_request}`, fdata);
-      const qr_url = JSON.parse(res?.data?.data) || "";
-  //  console.log(qr_url,"This is final qr code response");
+      const qr_url = JSON.parse(res?.data?.data)?.payment_link || "";
+      // const qr_url = JSON.parse(res?.data?.data) || "";
       if (qr_url) {
         setDeposit_req_data(qr_url);
       } else {
@@ -383,17 +386,18 @@ function WalletRecharge() {
       </>
     );
   }, []);
+
   // deposit_req_data
   if (deposit_req_data) {
-    return (
-      <QRScreen
-        callBackResponse={callBackResponse}
-        deposit_req_data={deposit_req_data}
-        show_time={show_time}
-      />
-    );
+    window.open(deposit_req_data);
+    // return (
+    //   <QRScreen
+    //     callBackResponse={callBackResponse}
+    //     deposit_req_data={deposit_req_data}
+    //     show_time={show_time}
+    //   />
+    // );
   }
-
   return (
     <Layout>
       {audio}

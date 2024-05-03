@@ -11,8 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "react-query";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import CustomCircularProgress from "../../Shared/CustomCircularProgress";
 import { zubgback, zubgbackgrad, zubgmid } from "../../Shared/color";
 import cip from "../../assets/cip.png";
@@ -39,11 +39,15 @@ import s from "../../assets/images/wallet.png";
 import sunlotteryhomebanner from "../../assets/sunlotteryhomebanner.jpg";
 import Layout from "../../component/Layout/Layout";
 import { MyProfileDataFn } from "../../services/apicalling";
+import axios from "axios";
 function Account() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const transactionId = searchParams?.get("orderid");
+  const client = useQueryClient();
   const navigate = useNavigate();
   const profile_data = localStorage.getItem("profile_data");
   const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(true);
-
   const [imageNumber, setImageNumber] = useState(profile_data || "1");
   const { isLoading, data } = useQuery(["myprofile"], () => MyProfileDataFn(), {
     refetchOnMount: false,
@@ -58,7 +62,27 @@ function Account() {
     { id: 4, img: dp4 },
   ];
 
-  useEffect(() => {}, []);
+  async function sendUrlCallBackToBackend(transactionId) {
+    try {
+      const res = await axios.get(
+        `https://admin.sunlottery.fun/api/deposit-collback?orderid=${transactionId}`
+      );
+      if (res?.data?.status === "200") {
+        window.location.href = "https://sunlottery.fun/account"
+      }
+      console.log(res);
+    } catch (e) {
+      console.log(e);
+    }
+    client.removeQueries("myprofile");
+  }
+
+  useEffect(() => {
+    if (transactionId) {
+      sendUrlCallBackToBackend(transactionId);
+    }
+  }, []);
+
 
   return (
     <Layout>
@@ -455,7 +479,10 @@ function Account() {
           </Button>
         </Box>
         {openDialogBoxHomeBanner && (
-          <Dialog PaperProps={{width:"500px",height:"500px"}} open={openDialogBoxHomeBanner}>
+          <Dialog
+            PaperProps={{ width: "500px", height: "500px" }}
+            open={openDialogBoxHomeBanner}
+          >
             <div>
               <p>
                 <IconButton onClick={() => setopenDialogBoxHomeBanner(false)}>
@@ -463,7 +490,7 @@ function Account() {
                 </IconButton>
               </p>
               <p>
-                <img  src={sunlotteryhomebanner} />
+                <img src={sunlotteryhomebanner} />
               </p>
             </div>
           </Dialog>

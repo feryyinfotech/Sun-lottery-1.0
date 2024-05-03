@@ -126,7 +126,6 @@ function Withdrawl() {
         return toast("Amount shoulb be minimum 110 and maximum 50,000");
 
       const data = result?.find((i) => i?.id === fk.values.bank_id);
-      console.log(data, "This is bank data");
       if (!data) return toast("Data not found");
 
       const fd = new FormData();
@@ -141,17 +140,13 @@ function Withdrawl() {
       fd.append("Mobile", data?.mobile);
       fd.append("user_id", user_id);
 
-      // JSON.stringify(fk.values.bank_id)
+      return toast(
+        "We are upgrading for smooth and fast payout please wait..."
+      );
+      
       Number(first_rechange) === 1
         ? withdraw_payment_Function(fd)
         : toast("You must be sure that , your first deposit is done.");
-
-      // paymentRequest(fd, fk.values.amount);
-      // fk.setFieldValue("all_data", {
-      //   t_id: fd.get("TransactionID") || "",
-      //   amount: fk.values.amount,
-      //   date: new Date(),
-      // });
     },
   });
 
@@ -170,7 +165,8 @@ function Withdrawl() {
             <div>
               {response?.data?.msg} First, you have to place a bet of{" "}
               <span className="!text-lg !text-[#FBA343] !font-bold">
-                {rupees} {response?.data?.remaining_bet && response?.data?.remaining_bet}
+                {rupees}{" "}
+                {response?.data?.remaining_bet && response?.data?.remaining_bet}
               </span>{" "}
               rupees before you can withdraw
             </div>
