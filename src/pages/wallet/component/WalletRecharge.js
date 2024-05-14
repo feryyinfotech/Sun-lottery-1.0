@@ -133,7 +133,7 @@ function WalletRecharge() {
       fd.append("Name", user_name);
       fd.append("TransactionID", transaction_id);
 
-      // return toast("We are upgrading for smooth and fast payin please wait...");
+      return toast("We are upgrading for smooth and fast payin please wait...");
 
       paymentRequest(fd, fk.values.amount);
       fk.setFieldValue("all_data", {

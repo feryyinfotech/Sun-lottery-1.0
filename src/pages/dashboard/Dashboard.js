@@ -523,8 +523,8 @@ function Dashboard() {
                     if (
                       i.name === "Slots" ||
                       i.name === "Popular" ||
-                      i.name === "Casino" ||
-                      i.name === "Aviator"
+                      i.name === "Casino" 
+                      // || i.name === "Aviator"
                     )
                       return toast("Comming Soon !");
                     scrollToSection("games");

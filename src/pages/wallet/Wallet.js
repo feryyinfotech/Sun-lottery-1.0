@@ -1,5 +1,12 @@
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
-import { Box, Container, Dialog, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Dialog,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import * as React from "react";
 import ReactApexChart from "react-apexcharts";
 import { useQuery } from "react-query";
@@ -20,7 +27,8 @@ import sunlotteryhomebanner from "../../assets/sunlotteryhomebanner.jpg";
 function Wallet() {
   const isMediumScreen = useMediaQuery({ minWidth: 800 });
   const navigate = useNavigate();
-  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = React.useState(true);
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] =
+    React.useState(false);
   const { isLoading, data } = useQuery(["myprofile"], () => MyProfileDataFn(), {
     refetchOnMount: false,
     refetchOnReconnect: true,
@@ -28,9 +36,7 @@ function Wallet() {
   const result = data?.data?.data;
 
   const main_wallet = {
-    series: [(
-      Number(result?.bonus || 0)
-    )?.toFixed(0) || 0],
+    series: [Number(result?.bonus || 0)?.toFixed(0) || 0],
     options: {
       chart: {
         height: 350,
@@ -111,11 +117,7 @@ function Wallet() {
     },
   };
   const third_party_wallet = {
-    series: [(
-      Number(
-        Number(result?.winning_wallet || 0) 
-      ) || 0
-    )?.toFixed(0)],
+    series: [(Number(Number(result?.winning_wallet || 0)) || 0)?.toFixed(0)],
     options: {
       chart: {
         height: 350,
@@ -249,7 +251,7 @@ function Wallet() {
                 {(
                   Number(
                     Number(result?.winning_wallet || 0) +
-                    Number(result?.wallet || 0)
+                      Number(result?.wallet || 0)
                   ) || 0
                 )?.toFixed(0)}
               </Typography>
@@ -284,9 +286,7 @@ function Wallet() {
                 }}
               >
                 <Typography variant="body1" color="initial">
-                  ₹{" "}
-                 
-                  {Number(result?.bonus || 0)}
+                  ₹ {Number(result?.bonus || 0)}
                 </Typography>
                 <Typography variant="body1" color="initial">
                   Bonus Amount
@@ -307,10 +307,10 @@ function Wallet() {
                 }}
               >
                 <Typography variant="body1" color="initial">
-                  ₹  {(
-                    Number(
-                      Number(result?.winning_wallet || 0)) || 0
-                  )?.toFixed(0)}
+                  ₹{" "}
+                  {(Number(Number(result?.winning_wallet || 0)) || 0)?.toFixed(
+                    0
+                  )}
                 </Typography>
                 <Typography variant="body1" color="initial">
                   Winning Amount
@@ -343,9 +343,7 @@ function Wallet() {
                 mt: "30px",
               }}
             >
-              <NavLink
-               to="/wallet/Recharge"
-               >
+              <NavLink to="/wallet/Recharge">
                 <Box component="img" src={rechargeIcon} width={50}></Box>
                 <Typography variant="body1" color="initial" mt={1}>
                   Deposit
@@ -368,9 +366,7 @@ function Wallet() {
                 "&>a>img": { margin: "auto" },
               }}
             >
-              <NavLink 
-              to="/Withdrawal"
-              >
+              <NavLink to="/Withdrawal">
                 <Box component="img" src={withdrow} width={50}></Box>
                 <Typography variant="body1" color="initial" mt={1}>
                   Withdraw
@@ -499,7 +495,10 @@ function Wallet() {
           </Box>
         </Box>
         {openDialogBoxHomeBanner && (
-          <Dialog PaperProps={{width:"500px",height:"500px"}} open={openDialogBoxHomeBanner}>
+          <Dialog
+            PaperProps={{ width: "500px", height: "500px" }}
+            open={openDialogBoxHomeBanner}
+          >
             <div>
               <p>
                 <IconButton onClick={() => setopenDialogBoxHomeBanner(false)}>
@@ -507,7 +506,7 @@ function Wallet() {
                 </IconButton>
               </p>
               <p>
-                <img  src={sunlotteryhomebanner} />
+                <img src={sunlotteryhomebanner} />
               </p>
             </div>
           </Dialog>

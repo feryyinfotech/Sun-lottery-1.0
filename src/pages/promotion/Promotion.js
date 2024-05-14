@@ -23,7 +23,7 @@ import sunlotteryhomebanner from "../../assets/sunlotteryhomebanner.jpg";
 import { useState } from "react";
 
 function Promotion() {
-  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] =useState(true);
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] =useState(false);
 
   const { isLoading, data } = useQuery(
     ["promotion_data"],

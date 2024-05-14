@@ -212,6 +212,7 @@ export function animationabove_10_sec(mainDiv, animationAdded,dispatch,fk) {
     mainDiv.style.animation = `slideafter 5s linear forwards running ${
       (animationAdded - 5) / 5 - .3  
     }`;
+    
     mainDiv.addEventListener("animationend", () => {
       mainDiv.style.animation = `thirdAnimation .5s linear forwards running`;
     });

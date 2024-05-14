@@ -140,6 +140,7 @@ const AirPlane = ({ formik, fk }) => {
     hii(randomFlyingTime);
 
     const timerInterval = setInterval(() => {
+      
       const airplainimage = document.getElementsByClassName("maindiv")[0];
       const parentDiv = document.getElementsByClassName("parentdiv")[0]; // Assuming "maindiv" is the parent element
       const airplainRect = airplainimage.getBoundingClientRect();

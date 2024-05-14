@@ -47,7 +47,7 @@ function Account() {
   const client = useQueryClient();
   const navigate = useNavigate();
   const profile_data = localStorage.getItem("profile_data");
-  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(true);
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(false);
   const [imageNumber, setImageNumber] = useState(profile_data || "1");
   const { isLoading, data } = useQuery(["myprofile"], () => MyProfileDataFn(), {
     refetchOnMount: false,

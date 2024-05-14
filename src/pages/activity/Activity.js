@@ -18,7 +18,7 @@ import { useState } from "react";
 
 function Activity() {
   const navigate = useNavigate();
-  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(true);
+  const [openDialogBoxHomeBanner, setopenDialogBoxHomeBanner] = useState(false);
 
   const goBack = () => {
     navigate(-1);
