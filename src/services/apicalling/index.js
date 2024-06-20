@@ -1,5 +1,5 @@
 import axios from "axios";
-import { endpoint } from "../urls";
+import { dummy_aviator, endpoint } from "../urls";
 import toast from "react-hot-toast";
 import { aviator_login_data_fn } from "../../redux/slices/counterSlice";
 import CryptoJS from "crypto-js";
@@ -158,9 +158,20 @@ export const getAllBetsAviator = async () => {
   }
 };
 export const walletamount = async () => {
+  // try {
+  //   const response = await axios.get(
+  //     `${endpoint.userwallet}?userid=${user_id}`
+  //   );
+  //   return response;
   try {
-    const response = await axios.get(
-      `${endpoint.userwallet}?userid=${user_id}`
+  const user = JSON.parse(localStorage.getItem("user"));
+
+    const reqbody = {
+      id:user?._id
+    }
+    const response = await axios.post(
+      `${dummy_aviator}/api/v1/get-wallet-amount-by-id`,
+      reqbody
     );
     return response;
   } catch (e) {
@@ -214,7 +225,7 @@ export const registrationBonusFn = async () => {
     const response = await axios.get(
       `${endpoint.registration_bonus}?user_id=${user_id}`
     );
-    console.log(response)
+    console.log(response);
     return response;
   } catch (e) {
     toast(e?.message);
@@ -226,7 +237,7 @@ export const team_trading_bonus_functoin = async () => {
     const response = await axios.get(
       `${endpoint.team_trading_bonus}?user_id=${user_id}`
     );
-    console.log(response)
+    console.log(response);
     return response;
   } catch (e) {
     toast(e?.message);
@@ -278,7 +289,7 @@ export const dailyWalletIncomeFn = async () => {
   }
 };
 export const dailySalaryIncomeFn = async () => {
-  // 
+  //
   try {
     const response = await axios.get(
       `${endpoint.daily_salary_income}?user_id=${user_id}`
@@ -290,7 +301,7 @@ export const dailySalaryIncomeFn = async () => {
   }
 };
 export const teamRewartBonus = async () => {
-  // 
+  //
   try {
     const response = await axios.get(
       `${endpoint.team_reward_bonus}?user_id=${user_id}`

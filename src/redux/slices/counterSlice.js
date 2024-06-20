@@ -16,7 +16,7 @@ export const slice = createSlice({
     backgroundMusic_url:
       localStorage.getItem("bg_music") ||
       "https://res.cloudinary.com/do7kimovl/video/upload/v1709029785/bg_music_iiovsn.mp3",
-    waiting_aviator: true,
+    waiting_aviator: false,
     just_start_after_waiting:true,
     please_reconnect_the_server:false,
     dummycounter:1,

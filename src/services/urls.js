@@ -4,11 +4,14 @@ export const baseUrl = "https://admin.sunlottery.fun";
 export const fron_end_main_domain = "https://sunlottery.fun";
 
 
-export const domain = "https://sun-lottery-timer-tlhr.onrender.com/";
-// export const domain = "http://localhost:9000/"
+// export const domain = "https://sun-lottery-timer-tlhr.onrender.com/";
+export const domain = "http://localhost:4000";
+export const dummy_aviator = "http://192.168.18.183:4000"
 
-export const support_mail = `support@sunlottrey.fun`;
-export const telegram_url = `https://t.me/SunLottaryOfficial`;
+export const support_mail = ""
+// `support@sunlottrey.fun`;
+export const telegram_url = ""
+// `https://t.me/SunLottaryOfficial`;
 
 export const endpoint = {
   login: `${baseUrl}/api/user_login`,

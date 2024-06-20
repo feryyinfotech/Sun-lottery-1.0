@@ -15,14 +15,10 @@ import {
 } from "../redux/slices/counterSlice";
 import { endpoint } from "../services/urls";
 import {
-  animationUpTo_1_sec,
-  animationUpTo_5_sec,
-  animationabove_10_sec,
-  animationupto_10_sec,
   demomobile,
   demomobilesec,
   demomolap,
-  demomolaponesec,
+  demomolaponesec
 } from "./AnimationAirPlan";
 import {
   ButtomDottedPoint,
@@ -34,6 +30,7 @@ import SpentBetLeft from "./SpentBetLeft";
 import SpentBetRight from "./SpentBetRight";
 const AirPlane = ({ formik, fk }) => {
   const socket = useSocket();
+  let timerInterval;
   const dispatch = useDispatch();
   const backgroundImage_url = useSelector(
     (state) => state.aviator.backgroundImage_url
@@ -44,25 +41,19 @@ const AirPlane = ({ formik, fk }) => {
     x: 0,
     y: 0,
   });
+  const [crash, setcrashed] = useState(false);
   const [combineTime, setcombineTime] = useState("0_0");
   const [initialCordinate, setInitialCordinate] = useState(0);
   let milliseconds = combineTime?.split("_")?.[0].substring(0, 2);
   let seconds = Number(combineTime?.split("_")?.[1]);
   const client = useQueryClient();
   let bool = true;
+
   useEffect(() => {
     const handleNewMessage = (newMessage) => {
       startFly(newMessage);
     };
 
-    socket.on("message", handleNewMessage);
-
-    return () => {
-      socket.off("message", handleNewMessage);
-    };
-  }, []); // Include startFly as a dependency if it's defined outside the useEffect.
-
-  useEffect(() => {
     const handleSeconds = (seconds) => {
       setcombineTime(seconds);
     };
@@ -80,16 +71,23 @@ const AirPlane = ({ formik, fk }) => {
       fk.setFieldValue("isFlying", isFlying);
     };
 
+    const handlecrash = (isFlying) => {
+      setcrashed(isFlying);
+      client.refetchQueries("allresult");
+    };
+    socket.on("message", handleNewMessage);
     socket.on("seconds", handleSeconds);
     socket.on("setcolorofdigit", handleSetColorOfDigit);
     socket.on("setloder", handleSetLoader);
     socket.on("isFlying", handleIsFlying);
-
+    socket.on("crash", handlecrash);
     return () => {
+      socket.off("message", handleNewMessage);
       socket.off("seconds", handleSeconds);
       socket.off("setcolorofdigit", handleSetColorOfDigit);
       socket.off("setloder", handleSetLoader);
       socket.off("isFlying", handleIsFlying);
+      socket.off("crash", handlecrash);
     };
   }, []);
 
@@ -104,32 +102,37 @@ const AirPlane = ({ formik, fk }) => {
       else style.innerHTML = demomolap;
     }
     document.head.appendChild(style);
-    if (randomFlyingTime < 10) {
-      animationUpTo_1_sec(mainDiv, randomFlyingTime, dispatch, fk);
-      setTimeout(() => {
-        dispatch(byTimeIsEnableSound(true));
-        fk.setFieldValue("isShadowPath", false);
-      }, (randomFlyingTime - 0.3) * 1000);
-    } else if (randomFlyingTime <= 5) {
-      animationUpTo_5_sec(mainDiv, randomFlyingTime, dispatch, fk);
-      setTimeout(() => {
-        dispatch(byTimeIsEnableSound(true));
-        fk.setFieldValue("isShadowPath", false);
-      }, (randomFlyingTime - 0.3) * 1000);
-    } else if (randomFlyingTime > 5 && randomFlyingTime < 10) {
-      animationupto_10_sec(mainDiv, randomFlyingTime, dispatch, fk);
-      setTimeout(() => {
-        dispatch(byTimeIsEnableSound(true));
-        fk.setFieldValue("isShadowPath", false);
-      }, (randomFlyingTime - 0.3) * 1000);
-    } else {
-      animationabove_10_sec(mainDiv, randomFlyingTime, dispatch, fk);
-      setTimeout(() => {
-        dispatch(byTimeIsEnableSound(true));
-        fk.setFieldValue("isShadowPath", false);
-      }, (5 + ((randomFlyingTime - 5) / 5 - 0.3) * 5) * 1000);
-    }
+
+    mainDiv.style.animation = "";
+    mainDiv.style.animation = "slidein 5s linear forwards running";
+
+    mainDiv.addEventListener("animationend", () => {
+      if (mainDiv.style.animationName === "slidein") {
+        // After slidein animation ends, start slideafter animation
+        mainDiv.style.animation = "slideafter 5s linear forwards running 50";
+      } else if (mainDiv.style.animationName === "slideafter") {
+        // If needed, you can add more conditions for other animations
+      }
+    });
   }
+
+  useEffect(() => {
+    const mainDiv = document.getElementsByClassName("maindiv")[0];
+    if (crash === true) {
+      clearInterval(timerInterval);
+      // Remove any current animation and apply thirdAnimation
+      mainDiv.style.animation = "";
+      mainDiv.style.animation = "thirdAnimation .5s linear forwards running";
+
+      dispatch(byTimeIsEnableSound(false));
+      dispatch(byTimeIsEnableMusic(false));
+      fk.setFieldValue("isShadowPath", false);
+      localStorage.removeItem("spent_amount1");
+      fk.setFieldValue("waitingForNextTime1", false);
+      fk.setFieldValue("waitingForNextTime2", false);
+      formik.setFieldValue("refetch", Number(formik.values.refetch) + 1);
+    }
+  }, [crash]);
 
   function startFly(randomFlyingTime) {
     bool = true;
@@ -139,8 +142,7 @@ const AirPlane = ({ formik, fk }) => {
     const mainDiv = document.getElementsByClassName("maindiv")[0];
     hii(randomFlyingTime);
 
-    const timerInterval = setInterval(() => {
-      
+    timerInterval = setInterval(() => {
       const airplainimage = document.getElementsByClassName("maindiv")[0];
       const parentDiv = document.getElementsByClassName("parentdiv")[0]; // Assuming "maindiv" is the parent element
       const airplainRect = airplainimage.getBoundingClientRect();
@@ -157,36 +159,6 @@ const AirPlane = ({ formik, fk }) => {
       setBottomLeftCoordinates(newBottomLeftCoordinates);
     }, 10);
 
-    setTimeout(() => {
-      fk.setFieldValue("isEnablingWinner", false);
-    }, randomFlyingTime * 1000 - 2000);
-    // Clear interval after randomFlyingTime seconds
-    setTimeout(() => {
-      // fk.setFieldValue("setcolorofdigit", true);
-      fk.setFieldValue("isShadowPath", false);
-      localStorage.removeItem("spent_amount1");
-      // fk.setFieldValue("isStart1", false);
-      // fk.setFieldValue("isStart2", false);
-      // fk.setFieldValue("isFlying", false);
-      fk.setFieldValue("waitingForNextTime1", false);
-      fk.setFieldValue("waitingForNextTime2", false);
-      // setResultFuncton();
-      formik.setFieldValue("refetch", Number(formik.values.refetch) + 1);
-      mainDiv.style.animation = "";
-      clearInterval(timerInterval);
-    }, (randomFlyingTime - 0.5) * 1000);
-
-    setTimeout(() => {
-      dispatch(byTimeIsEnableMusic(false));
-    }, randomFlyingTime * 1000 + 3000);
-    setTimeout(() => {
-      dispatch(byTimeIsEnableSound(false));
-    }, randomFlyingTime * 1000 + 6000);
-
-    setTimeout(() => {
-      randomFlyingTime >= 3 && fk.setFieldValue("isShadowPath", true);
-    }, 800);
-
     return () => clearInterval(timerInterval);
   }
 
@@ -199,6 +171,10 @@ const AirPlane = ({ formik, fk }) => {
       console.log(e);
     }
   };
+
+  useEffect(() => {
+    Number(milliseconds) >= 3 && fk.setFieldValue("isShadowPath", true);
+  }, [milliseconds]);
 
   setTimeout(() => {
     fk.setFieldValue("closeButtomDot", false);

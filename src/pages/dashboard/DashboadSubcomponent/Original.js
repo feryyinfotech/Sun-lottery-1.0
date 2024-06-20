@@ -3,26 +3,45 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { zubgback, zubgbackgrad, zubgmid } from "../../../Shared/color";
 import go from "../../../assets/images/go.png";
-import scr1 from '../../../assets/images/src1.png';
+import scr1 from "../../../assets/images/src1.png";
 import kind from "../../../assets/images/win1/aviater.jpg";
 
 const Original = () => {
   const navigate = useNavigate();
 
-
   return (
     <Box>
       <Box sx={style.root}>
-        <Box sx={style.roottwo} component={NavLink} to={"/playgame"}>
-          <Box sx={{ width: "70%", height: "100%", position: 'relative' }}>
-            <Box sx={{
-              position: 'absolute', top: 0, left: '0', width: '100%', height: '100%', borderRadius: '10px 0px 0px 10px',
-            }}>
-              <Box component='img' src={scr1} sx={{ width: '100%', height: '100%', borderRadius: '10px 0px 0px 10px', opacity: '0.2' }}></Box>
+        <Box sx={style.roottwo} component={NavLink} to={"/aviator-login"}>
+          <Box sx={{ width: "70%", height: "100%", position: "relative" }}>
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: "0",
+                width: "100%",
+                height: "100%",
+                borderRadius: "10px 0px 0px 10px",
+              }}
+            >
+              <Box
+                component="img"
+                src={scr1}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "10px 0px 0px 10px",
+                  opacity: "0.2",
+                }}
+              ></Box>
             </Box>
             <Box sx={style.titleBox}>
               <Box>
-                <Typography variant="body1" color="initial" className="gametitle">
+                <Typography
+                  variant="body1"
+                  color="initial"
+                  className="gametitle"
+                >
                   Aviator
                 </Typography>
               </Box>
@@ -69,7 +88,7 @@ const style = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    position: 'relative',
+    position: "relative",
   },
 
   title: {
@@ -96,4 +115,3 @@ const style = {
     textAlign: "center",
   },
 };
-

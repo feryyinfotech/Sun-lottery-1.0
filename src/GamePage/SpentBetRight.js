@@ -7,19 +7,19 @@ import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import { useQueryClient } from "react-query";
 import { gray } from "./color";
 import { endpoint, rupees } from "../services/urls";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { get_user_data_fn } from "../services/apicalling";
 
 const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   const client = useQueryClient();
   const spent_amount2 = localStorage.getItem("spent_amount2");
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
   const first_rechange =
-  aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge
-  
+    aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
+
   const amount_total =
     client.getQueriesData("walletamount_aviator")?.[0]?.[1]?.data?.data || 0;
   const pre_amount = Number(
@@ -32,7 +32,6 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   const [betValue, setBetValue] = useState(10);
   // const [openCustomDialogBox, setOpenCustomDialogBox] = useState(false);
   const [gameno, setgameno] = useState({});
-
 
   useEffect(() => {
     !aviator_login_data && get_user_data_fn(dispatch);
@@ -51,12 +50,12 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
   });
 
   const spentBit = async () => {
-    if(Number(first_rechange) !== 1){
+    if (Number(first_rechange) !== 1) {
       return toast("You must be sure that , your first deposit is done.");
     }
     setloding(true);
     const reqbody = {
-      userid: aviator_login_data && JSON.parse(aviator_login_data)?.id || 2,
+      userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
       amount: betValue || 0,
     };
     try {
@@ -87,15 +86,16 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
     setloding(false);
   };
   useEffect(() => {
-    if(fk.values.isFlying && rightbitfk?.values?.isbetActive){
-      spentBit()
-    }else{
-      !rightbitfk?.values?.isbetActive  && fk.setFieldValue("isStart2",false)
+    if (fk.values.isFlying && rightbitfk?.values?.isbetActive) {
+      spentBit();
+    } else {
+      !rightbitfk?.values?.isbetActive && fk.setFieldValue("isStart2", false);
     }
   }, [fk.values.isFlying]);
 
   const getHistory = async () => {
-    const userid =aviator_login_data &&  JSON.parse(aviator_login_data)?.id || 2;
+    const userid =
+      (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2;
 
     try {
       const response = await axios.get(
@@ -110,8 +110,10 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
 
   const cashOut = async (sec, mili) => {
     const reqbody = {
-      userid:aviator_login_data &&  JSON.parse(aviator_login_data)?.id || 2,
-      amount: betValue || 0,
+      userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
+      amount:
+        Number(betValue * Number(`${seconds}.${milliseconds}`))?.toFixed(2) ||
+        0,
       gameno: gameno,
       multiplier: Number(`${sec}.${mili}`),
     };
@@ -229,7 +231,9 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
                 return (
                   <p
                     className={`bg-black rounded-full cursor-pointer lg:py-1 py-[4px] lg:text-[8px]`}
-                    onClick={() => setBetValue(i)}
+                    onClick={() => {
+                      !spent_amount2 && setBetValue(i);
+                    }}
                   >
                     {i}
                   </p>
@@ -263,7 +267,8 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
                 // cash out
                 if (fk.values.isStart2 && fk.values.isFlying) {
                   fk.setFieldValue("isStart2", false);
-                  if (pre_amount) cashOut(seconds, milliseconds);
+                  if (pre_amount && spent_amount2)
+                    cashOut(seconds, milliseconds);
                 }
                 // spent bet
                 else {
@@ -303,7 +308,10 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
                       fk.values.isStart2 && !fk.values.isFlying && "py-4"
                     }`}
                   >
-                    {fk.values.isStart2 && fk.values.isFlying && pre_amount && spent_amount2
+                    {fk.values.isStart2 &&
+                    fk.values.isFlying &&
+                    pre_amount &&
+                    spent_amount2
                       ? "Cash Out"
                       : fk.values.isStart2 && !fk.values.isFlying
                       ? "Cancel"
@@ -315,16 +323,10 @@ const SpentBetRight = ({ milliseconds, seconds, fk, formik }) => {
                   >
                     {fk.values.isStart2 && !fk.values.isFlying
                       ? ""
-                      : fk.values.isStart2
-                      ? `${
-                          betValue * seconds +
-                            Number(milliseconds?.toString()?.substring(0, 1)) ||
-                          0
-                        }.${
-                          Number(
-                            milliseconds?.toString()?.substring(1, 2) || 1
-                          ) * 10
-                        } x`
+                      : fk.values.isStart2 && spent_amount2
+                      ? `${Number(
+                          betValue * Number(`${seconds}.${milliseconds}`)
+                        )?.toFixed(2)} x`
                       : `${betValue?.toFixed(2) || 0} ${rupees}`}
                   </span>
                 </div>

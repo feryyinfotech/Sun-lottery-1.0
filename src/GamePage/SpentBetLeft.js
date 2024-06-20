@@ -1,20 +1,14 @@
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Stack,
-  Switch
-} from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Switch } from "@mui/material";
 import axios from "axios";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
-import { useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { get_user_data_fn } from "../services/apicalling";
-import { endpoint, rupees } from "../services/urls";
+import { get_user_data_fn, walletamount } from "../services/apicalling";
+import { dummy_aviator, endpoint, rupees } from "../services/urls";
 import { gray } from "./color";
 
 const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
@@ -22,8 +16,9 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   const aviator_login_data = useSelector(
     (state) => state.aviator.aviator_login_data
   );
+  const user = JSON.parse(localStorage.getItem("user"));
   const first_rechange =
-  aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge
+    aviator_login_data && JSON.parse(aviator_login_data)?.first_recharge;
   const client = useQueryClient();
   const spent_amount1 = localStorage.getItem("spent_amount1");
   const amount_total =
@@ -31,7 +26,6 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   const pre_amount = Number(
     Number(amount_total?.wallet || 0) + Number(amount_total?.winning || 0)
   ).toFixed(2);
-
 
   const [loding, setloding] = useState(false);
   // const logindata = localStorage.getItem("aviator_data");
@@ -43,6 +37,16 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
     custombetValue_auto_cash_out: (1.1).toFixed(2) || 0,
     isbetActive: false,
   };
+
+  const { isLoading: walletloding, data: walletdata } = useQuery(
+    ["walletamount_aviator"],
+    () => walletamount(),
+    {
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+    }
+  );
+  const wallet_amount = walletdata?.data?.data || 0;
 
   const leftbitfk = useFormik({
     initialValues: initialValues,
@@ -56,41 +60,55 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   }, []);
 
   const spentBit = async () => {
+    // if(Number(first_rechange) !== 1){
+    //   return toast("You must be sure that , your first deposit is done.");
+    // }
 
-    if(Number(first_rechange) !== 1){
-      return toast("You must be sure that , your first deposit is done.");
-    }
-   
+    // setloding(true);
+    // const reqbody = {
+    //   userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
+    //   amount: betValue || 0,
+    // };
+    // try {
+    //   const response = await axios.get(
+    //     `${endpoint.bet_now}?userid=${reqbody?.userid}&amount=${reqbody?.amount}`
+    //   );
     setloding(true);
     const reqbody = {
-      userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
+      userid: user?._id,
       amount: betValue || 0,
     };
-    try {
-      const response = await axios.get(
-        `${endpoint.bet_now}?userid=${reqbody?.userid}&amount=${reqbody?.amount}`
-      );
-      if (response?.data?.message === "Bet placed successfully") {
-        localStorage.setItem("spent_amount1", reqbody?.amount);
-        client.refetchQueries("historydata");
-        client.refetchQueries("walletamount_aviator");
-        // startFly("left");
+    if (Number(wallet_amount?.wallet) < Number(reqbody?.amount))
+      toast("Your wallet amount is low");
+    else {
+      try {
+        const response = await axios.post(
+          `${dummy_aviator}/api/v1/apply-bet`,
+          reqbody
+        );
+       
+        if (response?.data?.msg === "Data save successfully") {
+          localStorage.setItem("spent_amount1", reqbody?.amount);
+          client.refetchQueries("historydata");
+          client.refetchQueries("walletamount_aviator");
+          // startFly("left");
 
-        fk.setFieldValue("isStart1", true);
-        getHistory();
+          fk.setFieldValue("isStart1", true);
+          getHistory();
+        }
+        toast.success(response?.data?.msg, {
+          position: "top-center",
+          topOffset: "20%",
+        });
+      } catch (e) {
+        toast(e?.response?.data?.message, {
+          position: "top-center",
+          topOffset: "20%",
+        });
+        console.log(e);
       }
-      toast.success(response?.data?.message, {
-        position: "top-center",
-        topOffset: "20%",
-      });
-    } catch (e) {
-      toast(e?.response?.data?.message, {
-        position: "top-center",
-        topOffset: "20%",
-      });
-      console.log(e);
+      leftbitfk.setFieldValue("isbetActive", false);
     }
-    leftbitfk.setFieldValue("isbetActive", false);
     setloding(false);
   };
 
@@ -118,16 +136,29 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
   };
 
   const cashOut = async (sec, mili) => {
+    // const reqbody = {
+    //   userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
+    //   amount: betValue || 0,
+    //   gameno: gameno,
+    //   multiplier: Number(`${sec}.${mili}`),
+    // };
+    // try {
+    //   const response = await axios.get(
+    //     `${endpoint.cash_out}?userid=${reqbody.userid}&amount=${reqbody.amount}&multiplier=${reqbody.multiplier}&gamesno=${reqbody?.gameno}`
+    //   );
     const reqbody = {
-      userid: (aviator_login_data && JSON.parse(aviator_login_data)?.id) || 2,
-      amount: betValue || 0,
-      gameno: gameno,
+      userid: user?._id,
+      amount: betValue * Number(`${seconds}.${milliseconds}`),
       multiplier: Number(`${sec}.${mili}`),
     };
+
+   
     try {
-      const response = await axios.get(
-        `${endpoint.cash_out}?userid=${reqbody.userid}&amount=${reqbody.amount}&multiplier=${reqbody.multiplier}&gamesno=${reqbody?.gameno}`
+      const response = await axios.post(
+        `${dummy_aviator}/api/v1/cash-out`,
+        reqbody
       );
+
       // toast(response?.data?.message);
       toast.success(
         <div class="flex lg:gap-10 gap-5 !bg-[rgb(60, 179, 113,.5)]">
@@ -272,7 +303,9 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
                 return (
                   <p
                     className={`bg-black rounded-full cursor-pointer lg:py-1 py-[4px] lg:text-[8px]`}
-                    onClick={() => setBetValue(i)}
+                    onClick={() => {
+                      if (!spent_amount1) setBetValue(i);
+                    }}
                   >
                     {i}
                   </p>
@@ -306,7 +339,7 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
                 // cash out
                 if (fk.values.isStart1 && fk.values.isFlying) {
                   fk.setFieldValue("isStart1", false);
-                  if (pre_amount) {
+                  if (pre_amount && spent_amount1) {
                     cashOut(seconds, milliseconds);
                   }
                 }
@@ -363,16 +396,10 @@ const SpentBetLeft = ({ milliseconds, seconds, fk, formik }) => {
                   >
                     {fk.values.isStart1 && !fk.values.isFlying
                       ? ""
-                      : fk.values.isStart1
-                      ? `${
-                          betValue * seconds +
-                            Number(milliseconds?.toString()?.substring(0, 1)) ||
-                          0
-                        }.${
-                          Number(
-                            milliseconds?.toString()?.substring(1, 2) || 1
-                          ) * 10
-                        } x`
+                      : fk.values.isStart1 && spent_amount1
+                      ? `${Number(
+                          betValue * Number(`${seconds}.${milliseconds}`)
+                        )?.toFixed(2)} x`
                       : `${betValue?.toFixed(2) || 0} ${rupees}`}
                   </span>
                 </div>
